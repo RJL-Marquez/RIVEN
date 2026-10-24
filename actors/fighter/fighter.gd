@@ -1,41 +1,48 @@
 class_name Fighter
 extends CharacterBody2D
-## Phase 1 fighter: grounded, deliberate movement with a tactical step-dash.
-##
-## An input-buffered state machine drives movement and tells the rig which pose
-## to play. Combat states (attack / block / hit / KO) slot into the same enum
-## and match block in later phases without restructuring this.
-##
-## Facing is OPPONENT-relative: the fighter always faces `opponent_path` (so it
-## backpedals when moving away and only turns when the opponent crosses to its
-## other side), never the direction of movement.
+## Phase 1 fighter: grounded, deliberate movement plus acrobatic special
+## maneuvers triggered by input combos (all relative to facing, which is
+## opponent-relative):
+##   double-tap forward  -> lunge
+##   double-tap back     -> back handspring (flick)
+##   jump + forward      -> front flip (airborne)
+##   jump + back         -> back flip (airborne)
+##   crouch + forward    -> front roll (grounded)
+##   crouch + back       -> back roll (grounded, faster)
+## Each maneuver is a data-driven DashStyle asset in actors/fighter/moves/.
 
 @export_group("Movement feel")
-@export var walk_speed := 190.0        # deliberate, has mass
+@export var walk_speed := 190.0
 @export var gravity := 1250.0
-@export var jump_velocity := -430.0    # low, heavy hop
-@export var air_control := 0.6         # fraction of walk_speed usable midair
-
-@export_group("Dash")
-@export var dash_style: DashStyle       # data-driven dash (see actors/fighter/dash_styles/)
-@export var double_tap_window := 0.22   # max gap between taps to trigger a dash
+@export var jump_velocity := -430.0
+@export var air_control := 0.6
 
 @export_group("Timing")
-@export var land_time := 0.08          # brief landing recovery for weight
-@export var prejump_time := 0.09       # wind-up dip before launch, for momentum
+@export var land_time := 0.08
+@export var prejump_time := 0.09
+@export var double_tap_window := 0.22
 
 @export_group("Opponent")
-@export var opponent_path: NodePath    # the fighter always faces this node
+@export var opponent_path: NodePath
 
-enum State { IDLE, WALK, CROUCH, PREJUMP, JUMP, DASH, LAND }
+@export_group("Maneuvers")
+@export var move_lunge: DashStyle
+@export var move_handspring: DashStyle
+@export var move_air_flip: DashStyle
+@export var move_roll_fwd: DashStyle
+@export var move_roll_back: DashStyle
 
-var facing := 1          # 1 = right, -1 = left
+enum State { IDLE, WALK, CROUCH, PREJUMP, JUMP, MOVE, LAND }
+
+const MOVES := "res://actors/fighter/moves/"
+
+var facing := 1
 var state: State = State.IDLE
 
 var _state_time := 0.0
 var _dash_dir := 1
-var _active_dash: DashStyle
 var _spin_sign := 1
+var _active: DashStyle
 var _time := 0.0
 var _last_tap := {-1: -999.0, 1: -999.0}
 var _opponent: Node2D
@@ -45,18 +52,22 @@ var _opponent: Node2D
 func _ready() -> void:
 	if opponent_path != NodePath(""):
 		_opponent = get_node_or_null(opponent_path)
-	if dash_style == null:
-		dash_style = load("res://actors/fighter/dash_styles/step_flipout.tres")
+	if move_lunge == null: move_lunge = load(MOVES + "lunge.tres")
+	if move_handspring == null: move_handspring = load(MOVES + "handspring.tres")
+	if move_air_flip == null: move_air_flip = load(MOVES + "air_flip.tres")
+	if move_roll_fwd == null: move_roll_fwd = load(MOVES + "roll_fwd.tres")
+	if move_roll_back == null: move_roll_back = load(MOVES + "roll_back.tres")
 
 func _physics_process(delta: float) -> void:
 	_time += delta
 	_state_time += delta
-
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
 	var move := Input.get_axis("move_left", "move_right")
-	_detect_dash()
+
+	if (state == State.IDLE or state == State.WALK) and is_on_floor():
+		_try_specials(move)
 
 	match state:
 		State.IDLE: _state_idle(move)
@@ -64,7 +75,7 @@ func _physics_process(delta: float) -> void:
 		State.CROUCH: _state_crouch(move)
 		State.PREJUMP: _state_prejump()
 		State.JUMP: _state_jump(move)
-		State.DASH: _state_dash()
+		State.MOVE: _state_move()
 		State.LAND: _state_land()
 
 	move_and_slide()
@@ -73,6 +84,42 @@ func _physics_process(delta: float) -> void:
 
 func state_name() -> String:
 	return State.keys()[state]
+
+# -------------------------------------------------------- special inputs ---
+
+func _try_specials(move: float) -> bool:
+	var d := -1 if move < 0.0 else 1
+	var has_dir := absf(move) > 0.3
+
+	# double-tap a direction -> lunge (forward) / back handspring (back)
+	for dir in [-1, 1]:
+		var action := "move_left" if dir == -1 else "move_right"
+		if Input.is_action_just_pressed(action):
+			if _time - _last_tap[dir] <= double_tap_window:
+				_start_move(move_lunge if dir == facing else move_handspring, dir)
+				return true
+			_last_tap[dir] = _time
+
+	# jump + direction -> front / back flip (airborne)
+	if has_dir and Input.is_action_just_pressed("jump"):
+		_start_move(move_air_flip, d)
+		return true
+
+	# crouch + direction -> front / back roll (grounded)
+	if has_dir and Input.is_action_just_pressed("crouch"):
+		_start_move(move_roll_fwd if d == facing else move_roll_back, d)
+		return true
+
+	return false
+
+func _start_move(m: DashStyle, dir: int) -> void:
+	_active = m
+	_dash_dir = dir
+	_spin_sign = dir
+	velocity.x = dir * m.speed
+	if m.up > 0.0:
+		velocity.y = -m.up
+	_set_state(State.MOVE)
 
 # -------------------------------------------------------------- states ---
 
@@ -104,7 +151,6 @@ func _state_crouch(move: float) -> void:
 		_set_state(State.WALK if absf(move) > 0.1 else State.IDLE)
 
 func _state_prejump() -> void:
-	# Wind-up: plant and dip briefly, then launch. Gives the jump weight.
 	velocity.x = 0.0
 	if _state_time >= prejump_time:
 		velocity.y = jump_velocity
@@ -115,11 +161,8 @@ func _state_jump(move: float) -> void:
 	if is_on_floor() and velocity.y >= 0.0:
 		_set_state(State.LAND)
 
-func _state_dash() -> void:
-	# Commit: a burst, then a locked recovery you cannot act out of. Behavior
-	# is driven by the active DashStyle (grounded step/slide/roll vs airborne
-	# flip), including an optional full-body spin.
-	var s := _active_dash
+func _state_move() -> void:
+	var s := _active
 	var airborne := s.up > 0.0
 	if s.spin > 0.0:
 		var dur := (2.0 * s.up / gravity) if airborne else s.time
@@ -127,7 +170,7 @@ func _state_dash() -> void:
 		rig.set_spin(float(_spin_sign) * s.spin * TAU * prog)
 	if airborne:
 		velocity.x = _dash_dir * s.speed
-		if _state_time > 0.08 and is_on_floor() and velocity.y >= 0.0:
+		if _state_time > 0.1 and is_on_floor() and velocity.y >= 0.0:
 			rig.set_spin(0.0)
 			_set_state(State.LAND)
 	else:
@@ -150,34 +193,7 @@ func _set_state(s: State) -> void:
 	state = s
 	_state_time = 0.0
 
-func _detect_dash() -> void:
-	# Double-tap a direction (while grounded) to step-dash. Direction is pure
-	# input (not facing), so a back-dash keeps you facing the opponent.
-	if state == State.DASH or state == State.LAND or state == State.PREJUMP or not is_on_floor():
-		return
-	for dir in [-1, 1]:
-		var action := "move_left" if dir == -1 else "move_right"
-		if Input.is_action_just_pressed(action):
-			if _time - _last_tap[dir] <= double_tap_window:
-				_start_dash(dir)
-			_last_tap[dir] = _time
-
-func _start_dash(dir: int) -> void:
-	# Pick the forward style, or the back_override when dashing away from the
-	# opponent (facing is opponent-relative, so dir != facing = backward).
-	var style := dash_style
-	if dir != facing and dash_style.back_override != null:
-		style = dash_style.back_override
-	_active_dash = style
-	_dash_dir = dir
-	_spin_sign = dir
-	velocity.x = dir * style.speed
-	if style.up > 0.0:
-		velocity.y = -style.up
-	_set_state(State.DASH)
-
 func _update_facing() -> void:
-	# Always face the opponent; never turn just because we moved backward.
 	if _opponent and is_instance_valid(_opponent):
 		facing = -1 if _opponent.global_position.x < global_position.x else 1
 	rig.scale.x = facing
@@ -188,6 +204,6 @@ func _update_anim() -> void:
 		State.CROUCH: rig.set_anim("crouch")
 		State.PREJUMP: rig.set_anim("prejump")
 		State.JUMP: rig.set_anim("jump")
-		State.DASH: rig.set_anim(_active_dash.anim if _active_dash else "dash")
+		State.MOVE: rig.set_anim(_active.anim if _active else "idle")
 		State.LAND: rig.set_anim("land")
 		_: rig.set_anim("idle")

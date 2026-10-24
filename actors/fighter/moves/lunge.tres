@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DashStyle" format=3]
+
+[ext_resource type="Script" path="res://actors/fighter/dash_style.gd" id="1_qqion"]
+
+[resource]
+script = ExtResource("1_qqion")
+kind = "lunge"
+speed = 360.0
+time = 0.18
+recovery = 0.14
+anim = "lunge"

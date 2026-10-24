@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DashStyle" format=3]
+
+[ext_resource type="Script" path="res://actors/fighter/dash_style.gd" id="1_1sabt"]
+
+[resource]
+script = ExtResource("1_1sabt")
+kind = "airflip"
+speed = 280.0
+time = 0.0
+recovery = 0.1
+up = 560.0
+spin = 1.0
+anim = "airflip"

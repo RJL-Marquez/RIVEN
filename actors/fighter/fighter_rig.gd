@@ -78,21 +78,29 @@ func _process(delta: float) -> void:
 	_phase += delta
 	_update_gait()
 
-	if _anim == "flip":
+	if _anim == "handspring":
 		# Back handspring: spin about the feet, then lift so the leading end
 		# (overhead hands) rides the ground and the body never clips below it.
 		rotation = _spin
 		position.y = -FLIP_LEN * maxf(0.0, -cos(_spin))
 		bones["pelvis"].position.y = -54.0
-		_straight_legs()
+		_handspring_legs()
 	elif _anim == "roll":
 		rotation = _spin
 		position.y = -ROLL_LEN * maxf(0.0, -cos(_spin))
 		bones["pelvis"].position.y = -34.0
 		_tuck_legs()
+	elif _anim == "airflip":
+		# Airborne somersault: rotate the body about its own center (the body is
+		# lofted off the ground by the jump, so no ground clamp is needed).
+		rotation = _spin
+		var c := Vector2(0.0, -50.0)
+		position = c - c.rotated(_spin)
+		bones["pelvis"].position.y = -50.0
+		_tuck_legs()
 	else:
 		rotation = lerp_angle(rotation, 0.0, clampf(delta * 18.0, 0.0, 1.0))
-		position.y = lerp(position.y, 0.0, clampf(delta * 18.0, 0.0, 1.0))
+		position = position.lerp(Vector2.ZERO, clampf(delta * 18.0, 0.0, 1.0))
 		_spin = 0.0
 		# Legs: inverse kinematics, feet planted on the ground plane.
 		var lt := _leg_targets(_anim, _phase)
@@ -153,11 +161,11 @@ func _tuck_legs() -> void:
 		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-45.0)
 		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(90.0)
 
-func _straight_legs() -> void:
-	# Extend the body into a straight line (for the handspring).
+func _handspring_legs() -> void:
+	# Near-straight legs with a slight knee, for an arched handspring line.
 	for side in ["front", "back"]:
 		bones["upper_leg_" + side].rotation = deg_to_rad(90.0)
-		bones["lower_leg_" + side].rotation = 0.0
+		bones["lower_leg_" + side].rotation = deg_to_rad(-14.0)
 
 func _ik2(target: Vector2, l1: float, l2: float, knee_dir: float) -> Vector2:
 	# Returns Vector2(thigh_angle, shin_angle_relative). Knee bends toward
@@ -190,6 +198,8 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 			return {"hip": 50.0, "front": Vector2(20, 0), "back": Vector2(-24, 0)}
 		"land":
 			return {"hip": 42.0, "front": Vector2(16, 0), "back": Vector2(-16, 0)}
+		"lunge":
+			return {"hip": 44.0, "front": Vector2(34, 0), "back": Vector2(-30, 0)}
 		_:  # idle — bladed fighting stance: staggered feet, angled legs
 			return {"hip": 52.0, "front": Vector2(27, 0), "back": Vector2(-25, 0)}
 
@@ -224,14 +234,32 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 			return {"torso": 20.0, "upper_arm_back": 22.0, "upper_arm_front": -18.0}
 		"land":
 			return {"torso": 10.0}
-		"flip":
-			# Arms reach overhead so the hands lead to the floor; body straight.
+		"lunge":
+			# Aggressive forward thrust: lean in, lead arm punched forward.
 			return {
-				"torso": 0.0,
+				"torso": 14.0,
+				"upper_arm_front": -95.0,
+				"lower_arm_front": -10.0,
+				"upper_arm_back": 12.0,
+				"lower_arm_back": 10.0,
+			}
+		"handspring":
+			# Arched back, arms reach overhead so the hands lead to the floor.
+			return {
+				"torso": -16.0,
 				"upper_arm_back": -178.0,
 				"lower_arm_back": -4.0,
 				"upper_arm_front": -178.0,
 				"lower_arm_front": -4.0,
+			}
+		"airflip":
+			# Tuck in the air.
+			return {
+				"torso": 22.0,
+				"upper_arm_back": -72.0,
+				"lower_arm_back": -112.0,
+				"upper_arm_front": -72.0,
+				"lower_arm_front": -112.0,
 			}
 		"roll":
 			# Tuck into a ball.

@@ -11,7 +11,7 @@ extends Resource
 ##        roll  — grounded dash with a full body spin (evasive tumble)
 ##        flip  — airborne hop with a spin (launch via `up`)
 
-@export_enum("step", "slide", "roll", "flip") var kind: String = "step"
+@export var kind: String = "step"   # descriptive: lunge / handspring / airflip / roll
 @export var speed: float = 480.0        # horizontal dash speed (px/s)
 @export var time: float = 0.13          # grounded burst duration (s)
 @export var recovery: float = 0.15      # locked recovery after the move (s)

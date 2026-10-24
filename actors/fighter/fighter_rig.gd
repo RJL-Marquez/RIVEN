@@ -119,8 +119,8 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 			return {"hip": 50.0, "front": Vector2(20, 0), "back": Vector2(-24, 0)}
 		"land":
 			return {"hip": 42.0, "front": Vector2(16, 0), "back": Vector2(-16, 0)}
-		_:  # idle
-			return {"hip": 54.0, "front": Vector2(14, 0), "back": Vector2(-14, 0)}
+		_:  # idle — bladed fighting stance: staggered feet, angled legs
+			return {"hip": 52.0, "front": Vector2(27, 0), "back": Vector2(-25, 0)}
 
 func _foot_cycle(p: float, center_x: float, stride: float, lift: float) -> Vector2:
 	var s := sin(p)
@@ -145,14 +145,14 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 			return {"torso": 20.0, "upper_arm_back": 22.0, "upper_arm_front": -18.0}
 		"land":
 			return {"torso": 10.0}
-		_:  # idle — subtle breathing + light guard
+		_:  # idle — hands-up fighting guard + subtle breathing
 			var br := sin(t * 2.2) * 2.0
 			return {
-				"torso": br,
-				"upper_arm_back": 4.0 + br,
-				"upper_arm_front": 4.0 - br,
-				"lower_arm_back": 8.0,
-				"lower_arm_front": 8.0,
+				"torso": 6.0 + br,
+				"upper_arm_back": -52.0,
+				"lower_arm_back": -82.0,
+				"upper_arm_front": -58.0 - br,
+				"lower_arm_front": -74.0,
 			}
 
 # ------------------------------------------------------------- building ---

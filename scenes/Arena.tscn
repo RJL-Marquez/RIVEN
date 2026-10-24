@@ -36,6 +36,14 @@ polygon = PackedVector2Array(-800, -60, 800, -60, 800, -56, -800, -56)
 
 [node name="Fighter" parent="." instance=ExtResource("2")]
 position = Vector2(560, 560)
+opponent_path = NodePath("../Opponent")
+
+[node name="Opponent" type="Node2D" parent="."]
+position = Vector2(940, 560)
+
+[node name="Marker" type="Polygon2D" parent="Opponent"]
+color = Color(0.28, 0.31, 0.4, 0.55)
+polygon = PackedVector2Array(-11, 0, -11, -100, -6, -112, 6, -112, 11, -100, 11, 0)
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -52,4 +60,4 @@ offset_top = 666.0
 offset_right = 1260.0
 offset_bottom = 710.0
 theme_override_colors/font_color = Color(0.5, 0.55, 0.66, 1)
-text = "A / D  or  < / >   move      W / Up / Space   jump      S / Down   crouch      double-tap a direction = step-dash"
+text = "A / D  or  < / >   move      W / Up / Space   jump      S / Down   crouch      double-tap a direction = step-dash      (grey marker = opponent you always face)"

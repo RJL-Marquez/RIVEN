@@ -111,6 +111,8 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 				"front": _foot_cycle(p, 12.0, 16.0, 12.0),
 				"back": _foot_cycle(p + PI, -12.0, 16.0, 12.0),
 			}
+		"prejump":
+			return {"hip": 38.0, "front": Vector2(24, 0), "back": Vector2(-22, 0)}
 		"crouch":
 			return {"hip": 30.0, "front": Vector2(20, 0), "back": Vector2(-20, 0)}
 		"jump":
@@ -129,13 +131,23 @@ func _foot_cycle(p: float, center_x: float, stride: float, lift: float) -> Vecto
 func _targets_for(anim: String, t: float) -> Dictionary:
 	match anim:
 		"walk":
-			var sw := sin(t * 8.0)
+			# Keep the guard up while advancing / retreating (weapons will
+			# redefine arm poses per-weapon later).
+			var sw := sin(t * 8.0) * 6.0
 			return {
-				"upper_arm_back": -sw * 16.0,
-				"upper_arm_front": sw * 16.0,
-				"lower_arm_back": 6.0,
-				"lower_arm_front": 6.0,
-				"torso": 3.0,
+				"torso": 4.0,
+				"upper_arm_back": -50.0,
+				"lower_arm_back": -80.0,
+				"upper_arm_front": -56.0 + sw,
+				"lower_arm_front": -72.0,
+			}
+		"prejump":
+			return {
+				"torso": 16.0,
+				"upper_arm_back": -34.0,
+				"lower_arm_back": -62.0,
+				"upper_arm_front": -38.0,
+				"lower_arm_front": -58.0,
 			}
 		"crouch":
 			return {"torso": 24.0, "upper_arm_back": -4.0, "upper_arm_front": -4.0}

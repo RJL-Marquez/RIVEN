@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_0t6gm")
 kind = "roll"
-speed = 450.0
-time = 0.24
-recovery = 0.1
+speed = 360.0
+time = 0.46
+recovery = 0.12
 spin = 1.0
 anim = "roll"

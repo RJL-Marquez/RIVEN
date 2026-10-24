@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DashStyle" format=3]
+
+[ext_resource type="Script" path="res://actors/fighter/dash_style.gd" id="1_pqkbo"]
+
+[resource]
+script = ExtResource("1_pqkbo")
+kind = "slide"
+speed = 650.0
+time = 0.2
+recovery = 0.22

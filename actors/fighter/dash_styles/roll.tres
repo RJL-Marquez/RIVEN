@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DashStyle" format=3]
+
+[ext_resource type="Script" path="res://actors/fighter/dash_style.gd" id="1_idruo"]
+
+[resource]
+script = ExtResource("1_idruo")
+kind = "roll"
+speed = 540.0
+time = 0.34
+recovery = 0.16
+spin = 1.0
+anim = "roll"

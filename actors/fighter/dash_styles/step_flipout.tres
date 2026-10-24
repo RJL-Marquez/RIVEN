@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="DashStyle" format=3]
+
+[ext_resource type="Resource" path="res://actors/fighter/dash_styles/flip.tres" id="1_kvsh5"]
+[ext_resource type="Script" path="res://actors/fighter/dash_style.gd" id="2_baife"]
+
+[resource]
+script = ExtResource("2_baife")
+back_override = ExtResource("1_kvsh5")

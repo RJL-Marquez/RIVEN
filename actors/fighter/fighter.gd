@@ -16,11 +16,9 @@ extends CharacterBody2D
 @export var jump_velocity := -430.0    # low, heavy hop
 @export var air_control := 0.6         # fraction of walk_speed usable midair
 
-@export_group("Step-dash")
-@export var dash_speed := 520.0
-@export var dash_time := 0.14          # burst duration
-@export var dash_recovery := 0.18      # locked recovery after the burst (commitment)
-@export var double_tap_window := 0.22  # max gap between taps to trigger a dash
+@export_group("Dash")
+@export var dash_style: DashStyle       # data-driven dash (see actors/fighter/dash_styles/)
+@export var double_tap_window := 0.22   # max gap between taps to trigger a dash
 
 @export_group("Timing")
 @export var land_time := 0.08          # brief landing recovery for weight
@@ -36,6 +34,8 @@ var state: State = State.IDLE
 
 var _state_time := 0.0
 var _dash_dir := 1
+var _active_dash: DashStyle
+var _spin_sign := 1
 var _time := 0.0
 var _last_tap := {-1: -999.0, 1: -999.0}
 var _opponent: Node2D
@@ -45,6 +45,8 @@ var _opponent: Node2D
 func _ready() -> void:
 	if opponent_path != NodePath(""):
 		_opponent = get_node_or_null(opponent_path)
+	if dash_style == null:
+		dash_style = load("res://actors/fighter/dash_styles/step_flipout.tres")
 
 func _physics_process(delta: float) -> void:
 	_time += delta
@@ -114,13 +116,28 @@ func _state_jump(move: float) -> void:
 		_set_state(State.LAND)
 
 func _state_dash() -> void:
-	# Commit: a quick burst, then a locked recovery you cannot act out of.
-	if _state_time <= dash_time:
-		velocity.x = _dash_dir * dash_speed
-	elif _state_time <= dash_time + dash_recovery:
-		velocity.x = 0.0
+	# Commit: a burst, then a locked recovery you cannot act out of. Behavior
+	# is driven by the active DashStyle (grounded step/slide/roll vs airborne
+	# flip), including an optional full-body spin.
+	var s := _active_dash
+	var airborne := s.up > 0.0
+	if s.spin > 0.0:
+		var dur := (2.0 * s.up / gravity) if airborne else s.time
+		var prog := clampf(_state_time / maxf(dur, 0.05), 0.0, 1.0)
+		rig.set_spin(float(_spin_sign) * s.spin * TAU * prog)
+	if airborne:
+		velocity.x = _dash_dir * s.speed
+		if _state_time > 0.08 and is_on_floor() and velocity.y >= 0.0:
+			rig.set_spin(0.0)
+			_set_state(State.LAND)
 	else:
-		_set_state(State.IDLE)
+		if _state_time <= s.time:
+			velocity.x = _dash_dir * s.speed
+		elif _state_time <= s.time + s.recovery:
+			velocity.x = 0.0
+		else:
+			rig.set_spin(0.0)
+			_set_state(State.IDLE)
 
 func _state_land() -> void:
 	velocity.x = 0.0
@@ -146,8 +163,17 @@ func _detect_dash() -> void:
 			_last_tap[dir] = _time
 
 func _start_dash(dir: int) -> void:
+	# Pick the forward style, or the back_override when dashing away from the
+	# opponent (facing is opponent-relative, so dir != facing = backward).
+	var style := dash_style
+	if dir != facing and dash_style.back_override != null:
+		style = dash_style.back_override
+	_active_dash = style
 	_dash_dir = dir
-	velocity.x = dir * dash_speed
+	_spin_sign = dir
+	velocity.x = dir * style.speed
+	if style.up > 0.0:
+		velocity.y = -style.up
 	_set_state(State.DASH)
 
 func _update_facing() -> void:
@@ -162,6 +188,6 @@ func _update_anim() -> void:
 		State.CROUCH: rig.set_anim("crouch")
 		State.PREJUMP: rig.set_anim("prejump")
 		State.JUMP: rig.set_anim("jump")
-		State.DASH: rig.set_anim("dash")
+		State.DASH: rig.set_anim(_active_dash.anim if _active_dash else "dash")
 		State.LAND: rig.set_anim("land")
 		_: rig.set_anim("idle")

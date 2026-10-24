@@ -27,6 +27,12 @@ const WALK_STEP_LEN := 18.0   # body px advanced per radian of gait
 const WALK_STRIDE := 26.0     # foot forward/back reach
 const WALK_LIFT := 14.0       # swing-foot lift height
 
+# Spinning dashes (roll/flip) rotate about the feet then lift by this length *
+# max(0, -cos(angle)) so the leading end rides the ground and nothing clips
+# below it. FLIP_LEN = feet-to-overhead-hands; ROLL_LEN = tuck radius.
+const FLIP_LEN := 132.0
+const ROLL_LEN := 56.0
+
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
 const BONES := [
@@ -72,13 +78,21 @@ func _process(delta: float) -> void:
 	_phase += delta
 	_update_gait()
 
-	if _anim == "roll" or _anim == "flip":
-		# Tumbling dash: spin the whole body and tuck the legs (no ground IK).
+	if _anim == "flip":
+		# Back handspring: spin about the feet, then lift so the leading end
+		# (overhead hands) rides the ground and the body never clips below it.
 		rotation = _spin
-		bones["pelvis"].position.y = -40.0
+		position.y = -FLIP_LEN * maxf(0.0, -cos(_spin))
+		bones["pelvis"].position.y = -54.0
+		_straight_legs()
+	elif _anim == "roll":
+		rotation = _spin
+		position.y = -ROLL_LEN * maxf(0.0, -cos(_spin))
+		bones["pelvis"].position.y = -34.0
 		_tuck_legs()
 	else:
 		rotation = lerp_angle(rotation, 0.0, clampf(delta * 18.0, 0.0, 1.0))
+		position.y = lerp(position.y, 0.0, clampf(delta * 18.0, 0.0, 1.0))
 		_spin = 0.0
 		# Legs: inverse kinematics, feet planted on the ground plane.
 		var lt := _leg_targets(_anim, _phase)
@@ -138,6 +152,12 @@ func _tuck_legs() -> void:
 	for side in ["front", "back"]:
 		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-45.0)
 		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(90.0)
+
+func _straight_legs() -> void:
+	# Extend the body into a straight line (for the handspring).
+	for side in ["front", "back"]:
+		bones["upper_leg_" + side].rotation = deg_to_rad(90.0)
+		bones["lower_leg_" + side].rotation = 0.0
 
 func _ik2(target: Vector2, l1: float, l2: float, knee_dir: float) -> Vector2:
 	# Returns Vector2(thigh_angle, shin_angle_relative). Knee bends toward
@@ -204,9 +224,19 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 			return {"torso": 20.0, "upper_arm_back": 22.0, "upper_arm_front": -18.0}
 		"land":
 			return {"torso": 10.0}
-		"roll", "flip":
+		"flip":
+			# Arms reach overhead so the hands lead to the floor; body straight.
 			return {
-				"torso": 24.0,
+				"torso": 0.0,
+				"upper_arm_back": -178.0,
+				"lower_arm_back": -4.0,
+				"upper_arm_front": -178.0,
+				"lower_arm_front": -4.0,
+			}
+		"roll":
+			# Tuck into a ball.
+			return {
+				"torso": 26.0,
 				"upper_arm_back": -70.0,
 				"lower_arm_back": -110.0,
 				"upper_arm_front": -70.0,

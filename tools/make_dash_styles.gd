@@ -24,8 +24,9 @@ func _initialize() -> void:
 	ResourceSaver.save(roll, DIR + "/roll.tres")
 
 	var flip := DashStyle.new()
-	flip.kind = "flip"; flip.speed = 260.0; flip.recovery = 0.14
-	flip.up = 430.0; flip.spin = 1.0; flip.anim = "flip"
+	# Grounded back handspring (hands plant, feet over) — not an airborne launch.
+	flip.kind = "flip"; flip.speed = 300.0; flip.time = 0.42; flip.recovery = 0.12
+	flip.up = 0.0; flip.spin = 1.0; flip.anim = "flip"
 	ResourceSaver.save(flip, DIR + "/flip.tres")
 
 	# Default showcase: step forward, backflip out.

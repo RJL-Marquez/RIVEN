@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_nq116")
 kind = "flip"
-speed = 260.0
-recovery = 0.14
-up = 430.0
+speed = 300.0
+time = 0.42
+recovery = 0.12
 spin = 1.0
 anim = "flip"

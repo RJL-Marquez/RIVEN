@@ -15,6 +15,5 @@ position = Vector2(0, -50)
 shape = SubResource("cap")
 
 [node name="Rig" type="Node2D" parent="."]
-position = Vector2(0, -60)
 script = ExtResource("2")
 accent_color = Color(0.286, 0.761, 1, 1)

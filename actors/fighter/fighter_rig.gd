@@ -9,38 +9,47 @@ extends Node2D
 ## ideal for silhouette limbs; detailed art can be skinned onto the same bones
 ## later, and weapons attach to a hand bone.
 ##
-## Poses are driven by set_anim(): each animation returns per-bone angle offsets
-## (degrees) from the rest pose, which are smoothed toward every frame.
+## GROUNDING: the rig origin sits on the ground plane (local y = 0). The legs
+## are driven by 2-bone inverse kinematics so the FEET stay planted on that
+## plane while the hip height changes (tall when idle, low when crouching).
+## Nothing is ever drawn below y = 0, so the ground reads as a hard boundary,
+## like a real 2D fighter. The upper body (torso, arms, head) uses simple
+## forward-kinematics pose offsets.
 
 @export var body_color: Color = Color("#15171f")
 @export var accent_color: Color = Color("#49c2ff")
 
+const THIGH := 30.0
+const SHIN := 30.0
+
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
-# limb length, limb width. Angles: 0 = local +X; +90 points down (+Y).
+# limb length, limb width. Leg bone rotations are overridden each frame by IK.
 const BONES := [
-	{"name": "pelvis",          "parent": "",               "pos": Vector2.ZERO,   "rest": 0.0,   "len": 0.0,  "w": 0.0},
-	{"name": "torso",           "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": -90.0, "len": 44.0, "w": 20.0},
-	{"name": "upper_arm_back",  "parent": "torso",          "pos": Vector2(38, 0), "rest": 185.0, "len": 22.0, "w": 7.0},
-	{"name": "lower_arm_back",  "parent": "upper_arm_back", "pos": Vector2(22, 0), "rest": 8.0,   "len": 20.0, "w": 6.0},
-	{"name": "upper_arm_front", "parent": "torso",          "pos": Vector2(38, 0), "rest": 175.0, "len": 22.0, "w": 7.0},
-	{"name": "lower_arm_front", "parent": "upper_arm_front","pos": Vector2(22, 0), "rest": 8.0,   "len": 20.0, "w": 6.0},
-	{"name": "upper_leg_back",  "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": 95.0,  "len": 30.0, "w": 9.0},
-	{"name": "lower_leg_back",  "parent": "upper_leg_back", "pos": Vector2(30, 0), "rest": 0.0,   "len": 30.0, "w": 8.0},
-	{"name": "upper_leg_front", "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": 85.0,  "len": 30.0, "w": 9.0},
-	{"name": "lower_leg_front", "parent": "upper_leg_front","pos": Vector2(30, 0), "rest": 0.0,   "len": 30.0, "w": 8.0},
+	{"name": "pelvis",          "parent": "",               "pos": Vector2.ZERO,   "rest": 0.0,   "len": 0.0,   "w": 0.0},
+	{"name": "torso",           "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": -90.0, "len": 44.0,  "w": 20.0},
+	{"name": "upper_arm_back",  "parent": "torso",          "pos": Vector2(38, 0), "rest": 185.0, "len": 22.0,  "w": 7.0},
+	{"name": "lower_arm_back",  "parent": "upper_arm_back", "pos": Vector2(22, 0), "rest": 8.0,   "len": 20.0,  "w": 6.0},
+	{"name": "upper_arm_front", "parent": "torso",          "pos": Vector2(38, 0), "rest": 175.0, "len": 22.0,  "w": 7.0},
+	{"name": "lower_arm_front", "parent": "upper_arm_front","pos": Vector2(22, 0), "rest": 8.0,   "len": 20.0,  "w": 6.0},
+	{"name": "upper_leg_back",  "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": 95.0,  "len": THIGH, "w": 9.0},
+	{"name": "lower_leg_back",  "parent": "upper_leg_back", "pos": Vector2(THIGH, 0), "rest": 0.0, "len": SHIN,  "w": 8.0},
+	{"name": "upper_leg_front", "parent": "pelvis",         "pos": Vector2.ZERO,   "rest": 85.0,  "len": THIGH, "w": 9.0},
+	{"name": "lower_leg_front", "parent": "upper_leg_front","pos": Vector2(THIGH, 0), "rest": 0.0, "len": SHIN,  "w": 8.0},
 ]
+
+const FK_BONES := ["torso", "upper_arm_back", "lower_arm_back", "upper_arm_front", "lower_arm_front", "head"]
 
 var bones := {}       # name -> Node2D
 var rest_rot := {}    # name -> float (radians)
 
 var _anim := "idle"
 var _phase := 0.0
-var _offsets := {}    # name -> current applied offset (deg)
-var _vert := 0.0
-var _base_y := 0.0
+var _offsets := {}                     # FK bone name -> current offset (deg)
+var _hip_h := 54.0                     # current hip height above the ground
+var _foot_front := Vector2(14, 0)      # current planted foot target (rig space)
+var _foot_back := Vector2(-14, 0)
 
 func _ready() -> void:
-	_base_y = position.y
 	_build()
 
 func set_anim(anim_name: String) -> void:
@@ -48,20 +57,105 @@ func set_anim(anim_name: String) -> void:
 
 func _process(delta: float) -> void:
 	_phase += delta
-	var targets := _targets_for(_anim, _phase)
-	var k := clampf(delta * 14.0, 0.0, 1.0)
-	for name in bones.keys():
-		if not rest_rot.has(name):
-			continue
-		var cur: float = _offsets.get(name, 0.0)
-		var tgt: float = targets.get(name, 0.0)
-		cur = lerp(cur, tgt, k)
-		_offsets[name] = cur
-		bones[name].rotation = rest_rot[name] + deg_to_rad(cur)
-	_vert = lerp(_vert, _vert_for(_anim), clampf(delta * 12.0, 0.0, 1.0))
-	position.y = _base_y + _vert
 
-# ---------------------------------------------------------------- building ---
+	# --- Legs: inverse kinematics, feet planted on the ground plane ---
+	var lt := _leg_targets(_anim, _phase)
+	var ks := clampf(delta * 12.0, 0.0, 1.0)
+	_hip_h = lerp(_hip_h, float(lt["hip"]), ks)
+	_foot_front = _foot_front.lerp(lt["front"], ks)
+	_foot_back = _foot_back.lerp(lt["back"], ks)
+	bones["pelvis"].position.y = -_hip_h
+	_apply_leg("front", _foot_front)
+	_apply_leg("back", _foot_back)
+
+	# --- Upper body: forward-kinematics pose offsets ---
+	var targets := _targets_for(_anim, _phase)
+	var kf := clampf(delta * 14.0, 0.0, 1.0)
+	for bone_name in FK_BONES:
+		if not rest_rot.has(bone_name):
+			continue
+		var cur: float = _offsets.get(bone_name, 0.0)
+		cur = lerp(cur, float(targets.get(bone_name, 0.0)), kf)
+		_offsets[bone_name] = cur
+		bones[bone_name].rotation = rest_rot[bone_name] + deg_to_rad(cur)
+
+# ------------------------------------------------------------- IK ---
+
+func _apply_leg(prefix: String, foot_rig: Vector2) -> void:
+	# Foot target is in rig space (y = 0 is the ground). Convert to the hip's
+	# local frame (the hip sits at height _hip_h above the ground).
+	var foot_local := Vector2(foot_rig.x, foot_rig.y + _hip_h)
+	var sol := _ik2(foot_local, THIGH, SHIN, 1.0)
+	bones["upper_leg_" + prefix].rotation = sol.x
+	bones["lower_leg_" + prefix].rotation = sol.y
+
+func _ik2(target: Vector2, l1: float, l2: float, knee_dir: float) -> Vector2:
+	# Returns Vector2(thigh_angle, shin_angle_relative). Knee bends toward
+	# knee_dir (+1 = forward for a right-facing fighter).
+	var d := clampf(target.length(), 0.001, l1 + l2 - 0.01)
+	var theta := atan2(target.y, target.x)
+	var a1 := acos(clampf((d * d + l1 * l1 - l2 * l2) / (2.0 * d * l1), -1.0, 1.0))
+	var a2 := acos(clampf((l1 * l1 + l2 * l2 - d * d) / (2.0 * l1 * l2), -1.0, 1.0))
+	return Vector2(theta - knee_dir * a1, knee_dir * (PI - a2))
+
+# ------------------------------------------------------------- targets ---
+
+func _leg_targets(anim: String, t: float) -> Dictionary:
+	# hip = hip height above ground; front/back = planted foot targets in rig
+	# space. Foot y is always <= 0 so nothing dips below the ground.
+	match anim:
+		"walk":
+			var p := t * 8.0
+			return {
+				"hip": 52.0,
+				"front": _foot_cycle(p, 12.0, 16.0, 12.0),
+				"back": _foot_cycle(p + PI, -12.0, 16.0, 12.0),
+			}
+		"crouch":
+			return {"hip": 30.0, "front": Vector2(20, 0), "back": Vector2(-20, 0)}
+		"jump":
+			return {"hip": 54.0, "front": Vector2(10, -10), "back": Vector2(-8, -16)}
+		"dash":
+			return {"hip": 50.0, "front": Vector2(20, 0), "back": Vector2(-24, 0)}
+		"land":
+			return {"hip": 42.0, "front": Vector2(16, 0), "back": Vector2(-16, 0)}
+		_:  # idle
+			return {"hip": 54.0, "front": Vector2(14, 0), "back": Vector2(-14, 0)}
+
+func _foot_cycle(p: float, center_x: float, stride: float, lift: float) -> Vector2:
+	var s := sin(p)
+	return Vector2(center_x + stride * s, -lift * maxf(0.0, s))
+
+func _targets_for(anim: String, t: float) -> Dictionary:
+	match anim:
+		"walk":
+			var sw := sin(t * 8.0)
+			return {
+				"upper_arm_back": -sw * 16.0,
+				"upper_arm_front": sw * 16.0,
+				"lower_arm_back": 6.0,
+				"lower_arm_front": 6.0,
+				"torso": 3.0,
+			}
+		"crouch":
+			return {"torso": 24.0, "upper_arm_back": -4.0, "upper_arm_front": -4.0}
+		"jump":
+			return {"upper_arm_back": -34.0, "upper_arm_front": -40.0, "torso": -4.0}
+		"dash":
+			return {"torso": 20.0, "upper_arm_back": 22.0, "upper_arm_front": -18.0}
+		"land":
+			return {"torso": 10.0}
+		_:  # idle — subtle breathing + light guard
+			var br := sin(t * 2.2) * 2.0
+			return {
+				"torso": br,
+				"upper_arm_back": 4.0 + br,
+				"upper_arm_front": 4.0 - br,
+				"lower_arm_back": 8.0,
+				"lower_arm_front": 8.0,
+			}
+
+# ------------------------------------------------------------- building ---
 
 func _build() -> void:
 	for b in BONES:
@@ -80,12 +174,11 @@ func _build() -> void:
 			poly.z_as_relative = false
 			poly.z_index = _z_for(b["name"])
 			node.add_child(poly)
+	bones["pelvis"].position.y = -_hip_h
 	_decorate()
 
 func _decorate() -> void:
-	# Hip fill so the pelvis joint doesn't look hollow.
 	_add_poly(bones["pelvis"], _circle(11.0, Vector2.ZERO), body_color, 4)
-	# Head on the torso tip, with an accent eye.
 	var head := Node2D.new()
 	head.name = "head"
 	bones["torso"].add_child(head)
@@ -94,7 +187,6 @@ func _decorate() -> void:
 	rest_rot["head"] = 0.0
 	_add_poly(head, _circle(11.0, Vector2(12, 0)), body_color, 13)
 	_add_poly(head, _circle(2.6, Vector2(16, -3)), accent_color, 22)
-	# Accent "core" gem on the chest — the per-fighter identity color.
 	_add_poly(bones["torso"], PackedVector2Array([
 		Vector2(22, -4), Vector2(28, 0), Vector2(22, 4), Vector2(16, 0)
 	]), accent_color, 23)
@@ -107,23 +199,23 @@ func _add_poly(parent_node: Node2D, points: PackedVector2Array, color: Color, z:
 	poly.z_index = z
 	parent_node.add_child(poly)
 
-func _z_for(name: String) -> int:
-	if "back" in name:
+func _z_for(bone_name: String) -> int:
+	if "back" in bone_name:
 		return 0
-	if "front" in name:
+	if "front" in bone_name:
 		return 10
 	return 5  # torso / pelvis
 
-# --------------------------------------------------------------- geometry ---
+# ------------------------------------------------------------- geometry ---
 
 func _capsule(length: float, width: float) -> PackedVector2Array:
 	var r := width * 0.5
 	var pts := PackedVector2Array()
 	var segs := 6
-	for i in range(segs + 1):  # start cap
+	for i in range(segs + 1):
 		var a := PI * 0.5 + PI * float(i) / segs
 		pts.append(Vector2(cos(a), sin(a)) * r)
-	for i in range(segs + 1):  # end cap
+	for i in range(segs + 1):
 		var a := -PI * 0.5 + PI * float(i) / segs
 		pts.append(Vector2(length, 0) + Vector2(cos(a), sin(a)) * r)
 	return pts
@@ -134,75 +226,3 @@ func _circle(r: float, center: Vector2) -> PackedVector2Array:
 		var a := TAU * float(i) / 16.0
 		pts.append(center + Vector2(cos(a), sin(a)) * r)
 	return pts
-
-# -------------------------------------------------------------- poses ---
-
-func _targets_for(anim: String, t: float) -> Dictionary:
-	match anim:
-		"walk":
-			var sw := sin(t * 9.0)
-			return {
-				"upper_leg_back": sw * 24.0,
-				"upper_leg_front": -sw * 24.0,
-				"lower_leg_back": clampf(-sw, 0.0, 1.0) * 26.0 + 6.0,
-				"lower_leg_front": clampf(sw, 0.0, 1.0) * 26.0 + 6.0,
-				"upper_arm_back": -sw * 16.0,
-				"upper_arm_front": sw * 16.0,
-				"lower_arm_back": 6.0,
-				"lower_arm_front": 6.0,
-				"torso": 3.0,
-			}
-		"crouch":
-			return {
-				"torso": 24.0,
-				"upper_leg_back": 50.0,
-				"upper_leg_front": -50.0,
-				"lower_leg_back": 70.0,
-				"lower_leg_front": 70.0,
-				"upper_arm_back": -4.0,
-				"upper_arm_front": -4.0,
-			}
-		"jump":
-			return {
-				"upper_leg_back": -22.0,
-				"upper_leg_front": -30.0,
-				"lower_leg_back": 34.0,
-				"lower_leg_front": 40.0,
-				"upper_arm_back": -34.0,
-				"upper_arm_front": -40.0,
-				"torso": -4.0,
-			}
-		"dash":
-			return {
-				"torso": 20.0,
-				"upper_leg_back": 30.0,
-				"upper_leg_front": -26.0,
-				"lower_leg_back": 10.0,
-				"lower_leg_front": 18.0,
-				"upper_arm_back": 22.0,
-				"upper_arm_front": -18.0,
-			}
-		"land":
-			return {
-				"torso": 10.0,
-				"upper_leg_back": 14.0,
-				"upper_leg_front": -14.0,
-				"lower_leg_back": 16.0,
-				"lower_leg_front": 16.0,
-			}
-		_:  # idle — subtle breathing + light guard
-			var br := sin(t * 2.2) * 2.0
-			return {
-				"torso": br,
-				"upper_arm_back": 4.0 + br,
-				"upper_arm_front": 4.0 - br,
-				"lower_arm_back": 8.0,
-				"lower_arm_front": 8.0,
-			}
-
-func _vert_for(anim: String) -> float:
-	match anim:
-		"crouch": return 40.0
-		"land": return 10.0
-		"jump": return -2.0
-		_: return 0.0

@@ -9,7 +9,7 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(DIR)
 	#     file         kind          speed  time  recov  up     spin  anim
 	_save("lunge",      "lunge",      480.0, 0.22, 0.16,  0.0,   0.0,  "lunge")
-	_save("handspring", "handspring", 300.0, 0.50, 0.12,  0.0,   1.0,  "handspring")
+	_save("handspring", "handspring", 0.0,   0.50, 0.10,  0.0,   1.0,  "handspring")
 	_save("air_flip",   "airflip",    320.0, 0.0,  0.10,  420.0, 1.0,  "airflip")
 	_save("roll_fwd",   "roll",       340.0, 0.52, 0.14,  0.0,   1.0,  "roll")
 	_save("roll_back",  "roll",       360.0, 0.46, 0.12,  0.0,   1.0,  "roll")

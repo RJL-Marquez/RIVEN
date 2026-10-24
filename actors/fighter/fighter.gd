@@ -35,6 +35,7 @@ extends CharacterBody2D
 enum State { IDLE, WALK, CROUCH, PREJUMP, JUMP, MOVE, LAND }
 
 const MOVES := "res://actors/fighter/moves/"
+const HANDSPRING_TRAVEL := 264.0   # 2 * FighterRig.FLIP_LEN; baked in at move end
 
 var facing := 1
 var state: State = State.IDLE
@@ -187,7 +188,16 @@ func _state_move() -> void:
 			rig.set_spin(0.0)
 			_set_state(State.LAND)
 	else:
-		if _state_time <= s.time:
+		if s.kind == "handspring":
+			# Travel comes from the glued-hands pivot geometry (the rig moves the
+			# visual across the floor); bake that displacement into the body at
+			# the end so the collision follows without a mid-move slide.
+			velocity.x = 0.0
+			if _state_time > s.time:
+				position.x += HANDSPRING_TRAVEL * float(_spin_sign)
+				rig.set_spin(0.0)
+				_set_state(State.IDLE)
+		elif _state_time <= s.time:
 			velocity.x = _dash_dir * s.speed
 		elif _state_time <= s.time + s.recovery:
 			velocity.x = 0.0

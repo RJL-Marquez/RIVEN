@@ -31,7 +31,7 @@ const WALK_LIFT := 4.0        # low shuffle lift
 # max(0, -cos(angle)) so the leading end rides the ground and nothing clips
 # below it. FLIP_LEN = feet-to-overhead-hands; ROLL_LEN = tuck radius.
 const FLIP_LEN := 132.0
-const ROLL_R := 56.0          # ball radius for center-pivot rolls
+const ROLL_LEN := 56.0        # tumble length for grounded rolls
 
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
@@ -79,32 +79,40 @@ func _process(delta: float) -> void:
 	_update_gait()
 
 	if _anim == "handspring":
-		# Back handspring: rotate about the body mid-point (flips in place
-		# instead of swinging off a pinned foot) and clamp the lowest end to the
-		# ground, so it passes through a true hands-down handstand with no clip
-		# and no teleport. Travel comes from the move's velocity.
+		# Back handspring with a glued-hands pivot: rotate about the foot while
+		# upright, then about the HANDS (fixed on the ground) through the
+		# handstand, then about the foot on the far side. The body travels 2*L
+		# across the floor; the fighter bakes that travel in at the end.
 		rotation = _spin
-		var half := FLIP_LEN * 0.5
-		position = Vector2(-half * sin(_spin), -FLIP_LEN * maxf(0.0, -cos(_spin)))
+		var L := FLIP_LEN
+		var sgn := signf(_spin) if absf(_spin) > 0.0001 else 1.0
+		var phi := fmod(absf(_spin), TAU)
+		if phi < PI * 0.5:
+			position = Vector2.ZERO
+		elif phi < PI * 1.5:
+			position = Vector2(sgn * L, 0.0) - Vector2(0.0, -L).rotated(_spin)
+		else:
+			position = Vector2(sgn * 2.0 * L, 0.0)
 		bones["pelvis"].position.y = -54.0
 		_handspring_legs()
 	elif _anim == "roll":
-		# Large ball rolling: the curled body rotates about its center, which
-		# rides at a constant height (the ball radius), so it rolls smoothly
-		# along the ground with no bob and no clipping. Travel comes from velocity.
+		# Grounded roll: the body curls in (eased), tumbles along the floor with
+		# its lowest point riding the ground, then opens back out to stand.
+		var tf := _spin_tuck()
 		rotation = _spin
-		var rc := Vector2(0.0, -ROLL_R)
-		position = rc - rc.rotated(_spin)
-		bones["pelvis"].position.y = -ROLL_R
-		_tuck_legs()
+		var half := ROLL_LEN * 0.5
+		position = Vector2(-half * sin(_spin), -ROLL_LEN * maxf(0.0, -cos(_spin)))
+		bones["pelvis"].position.y = -32.0
+		_curl_legs(tf)
 	elif _anim == "airflip":
-		# Airborne somersault: rotate the body about its own center (the body is
-		# lofted off the ground by the jump, so no ground clamp is needed).
+		# Airborne somersault about the body center; the tuck eases in to the
+		# middle of the flip and opens back out before landing.
+		var tf := _spin_tuck()
 		rotation = _spin
 		var c := Vector2(0.0, -50.0)
 		position = c - c.rotated(_spin)
 		bones["pelvis"].position.y = -50.0
-		_tuck_legs()
+		_curl_legs(tf)
 	else:
 		rotation = lerp_angle(rotation, 0.0, clampf(delta * 18.0, 0.0, 1.0))
 		position = position.lerp(Vector2.ZERO, clampf(delta * 18.0, 0.0, 1.0))
@@ -163,11 +171,17 @@ func _apply_leg(prefix: String, foot_rig: Vector2) -> void:
 	bones["upper_leg_" + prefix].rotation = sol.x
 	bones["lower_leg_" + prefix].rotation = sol.y
 
-func _tuck_legs() -> void:
-	# Tight diving / cannonball tuck: knees pulled to chest, shins folded in.
+func _curl_legs(tf: float) -> void:
+	# Tuck the legs in, scaled by tf (0 = extended, 1 = full diving tuck).
 	for side in ["front", "back"]:
-		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-70.0)
-		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(135.0)
+		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-70.0 * tf)
+		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(135.0 * tf)
+
+func _spin_tuck() -> float:
+	# Eases the tuck in toward the middle of a spin and back out: 0 at the
+	# start/end of the rotation, 1 at the halfway point.
+	var prog := clampf(absf(_spin) / TAU, 0.0, 1.0)
+	return sin(prog * PI)
 
 func _handspring_legs() -> void:
 	# Near-straight legs with a slight knee, for an arched handspring line.
@@ -261,22 +275,24 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 				"lower_arm_front": -4.0,
 			}
 		"airflip":
-			# Tuck in the air.
+			# Tuck in the air, eased in toward the middle of the flip.
+			var tfa := _spin_tuck()
 			return {
-				"torso": 22.0,
-				"upper_arm_back": -72.0,
-				"lower_arm_back": -112.0,
-				"upper_arm_front": -72.0,
-				"lower_arm_front": -112.0,
+				"torso": 22.0 * tfa,
+				"upper_arm_back": -72.0 * tfa,
+				"lower_arm_back": -112.0 * tfa,
+				"upper_arm_front": -72.0 * tfa,
+				"lower_arm_front": -112.0 * tfa,
 			}
 		"roll":
-			# Curl tightly into a ball (head tucked toward the knees).
+			# Curl the head toward the knees, eased in toward the middle of the roll.
+			var tfr := _spin_tuck()
 			return {
-				"torso": 135.0,
-				"upper_arm_back": -60.0,
-				"lower_arm_back": -120.0,
-				"upper_arm_front": -60.0,
-				"lower_arm_front": -120.0,
+				"torso": 135.0 * tfr,
+				"upper_arm_back": -60.0 * tfr,
+				"lower_arm_back": -120.0 * tfr,
+				"upper_arm_front": -60.0 * tfr,
+				"lower_arm_front": -120.0 * tfr,
 			}
 		_:  # idle — hands-up fighting guard + subtle breathing
 			var br := sin(t * 2.2) * 2.0

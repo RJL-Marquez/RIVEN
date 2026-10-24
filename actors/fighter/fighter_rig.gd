@@ -31,7 +31,7 @@ const WALK_LIFT := 4.0        # low shuffle lift
 # max(0, -cos(angle)) so the leading end rides the ground and nothing clips
 # below it. FLIP_LEN = feet-to-overhead-hands; ROLL_LEN = tuck radius.
 const FLIP_LEN := 132.0
-const ROLL_R := 60.0          # ball radius for center-pivot rolls
+const ROLL_R := 56.0          # ball radius for center-pivot rolls
 
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
@@ -164,9 +164,10 @@ func _apply_leg(prefix: String, foot_rig: Vector2) -> void:
 	bones["lower_leg_" + prefix].rotation = sol.y
 
 func _tuck_legs() -> void:
+	# Tight diving / cannonball tuck: knees pulled to chest, shins folded in.
 	for side in ["front", "back"]:
-		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-55.0)
-		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(110.0)
+		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-70.0)
+		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(135.0)
 
 func _handspring_legs() -> void:
 	# Near-straight legs with a slight knee, for an arched handspring line.
@@ -271,7 +272,7 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 		"roll":
 			# Curl tightly into a ball (head tucked toward the knees).
 			return {
-				"torso": 130.0,
+				"torso": 135.0,
 				"upper_arm_back": -60.0,
 				"lower_arm_back": -120.0,
 				"upper_arm_front": -60.0,

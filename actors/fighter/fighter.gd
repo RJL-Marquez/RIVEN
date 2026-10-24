@@ -43,6 +43,7 @@ var _state_time := 0.0
 var _dash_dir := 1
 var _spin_sign := 1
 var _active: DashStyle
+var _launched := false
 var _time := 0.0
 var _last_tap := {-1: -999.0, 1: -999.0}
 var _opponent: Node2D
@@ -116,9 +117,10 @@ func _start_move(m: DashStyle, dir: int) -> void:
 	_active = m
 	_dash_dir = dir
 	_spin_sign = dir
-	velocity.x = dir * m.speed
-	if m.up > 0.0:
-		velocity.y = -m.up
+	# Airborne moves (flips) wind up with a short crouch before launching;
+	# grounded moves start immediately.
+	_launched = m.up <= 0.0
+	velocity.x = (dir * m.speed) if m.up <= 0.0 else 0.0
 	_set_state(State.MOVE)
 
 # -------------------------------------------------------------- states ---
@@ -164,13 +166,24 @@ func _state_jump(move: float) -> void:
 func _state_move() -> void:
 	var s := _active
 	var airborne := s.up > 0.0
+
+	# Airborne moves get a short crouch wind-up before launch (gather momentum).
+	if airborne and not _launched:
+		velocity.x = 0.0
+		if _state_time >= prejump_time:
+			velocity.y = -s.up
+			velocity.x = _dash_dir * s.speed
+			_launched = true
+		return
+
 	if s.spin > 0.0:
 		var dur := (2.0 * s.up / gravity) if airborne else s.time
-		var prog := clampf(_state_time / maxf(dur, 0.05), 0.0, 1.0)
+		var elapsed := (_state_time - prejump_time) if airborne else _state_time
+		var prog := clampf(elapsed / maxf(dur, 0.05), 0.0, 1.0)
 		rig.set_spin(float(_spin_sign) * s.spin * TAU * prog)
 	if airborne:
 		velocity.x = _dash_dir * s.speed
-		if _state_time > 0.1 and is_on_floor() and velocity.y >= 0.0:
+		if (_state_time - prejump_time) > 0.1 and is_on_floor() and velocity.y >= 0.0:
 			rig.set_spin(0.0)
 			_set_state(State.LAND)
 	else:
@@ -204,6 +217,10 @@ func _update_anim() -> void:
 		State.CROUCH: rig.set_anim("crouch")
 		State.PREJUMP: rig.set_anim("prejump")
 		State.JUMP: rig.set_anim("jump")
-		State.MOVE: rig.set_anim(_active.anim if _active else "idle")
+		State.MOVE:
+			if _active != null and _active.up > 0.0 and not _launched:
+				rig.set_anim("prejump")
+			else:
+				rig.set_anim(_active.anim if _active else "idle")
 		State.LAND: rig.set_anim("land")
 		_: rig.set_anim("idle")

@@ -22,6 +22,11 @@ extends Node2D
 const THIGH := 30.0
 const SHIN := 30.0
 
+# Walk gait (distance-phased so feet track the ground instead of skating).
+const WALK_STEP_LEN := 18.0   # body px advanced per radian of gait
+const WALK_STRIDE := 26.0     # foot forward/back reach
+const WALK_LIFT := 14.0       # swing-foot lift height
+
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
 const BONES := [
@@ -48,6 +53,10 @@ var _offsets := {}                     # FK bone name -> current offset (deg)
 var _hip_h := 54.0                     # current hip height above the ground
 var _foot_front := Vector2(14, 0)      # current planted foot target (rig space)
 var _foot_back := Vector2(-14, 0)
+var _walk_phase := 0.0                  # distance-phased gait position
+var _move_sign := 0.0                   # +1 advancing, -1 retreating
+var _prev_gx := 0.0
+var _gx_init := false
 
 func _ready() -> void:
 	_build()
@@ -57,6 +66,7 @@ func set_anim(anim_name: String) -> void:
 
 func _process(delta: float) -> void:
 	_phase += delta
+	_update_gait()
 
 	# --- Legs: inverse kinematics, feet planted on the ground plane ---
 	var lt := _leg_targets(_anim, _phase)
@@ -78,6 +88,29 @@ func _process(delta: float) -> void:
 		cur = lerp(cur, float(targets.get(bone_name, 0.0)), kf)
 		_offsets[bone_name] = cur
 		bones[bone_name].rotation = rest_rot[bone_name] + deg_to_rad(cur)
+
+# ------------------------------------------------------------- gait ---
+
+func _update_gait() -> void:
+	# Advance the gait by how far the body actually travels (in facing terms),
+	# so planted feet track the ground instead of skating. Works for advancing
+	# and backpedaling, in either facing.
+	var gx := global_position.x
+	if not _gx_init:
+		_prev_gx = gx
+		_gx_init = true
+	var world_dx := gx - _prev_gx
+	_prev_gx = gx
+	var face := signf(scale.x) if absf(scale.x) > 0.01 else 1.0
+	var fwd := world_dx * face
+	if absf(fwd) > 0.02:
+		_move_sign = signf(fwd)
+	_walk_phase += fwd / WALK_STEP_LEN
+
+func _step_foot(ph: float) -> Vector2:
+	# Planted (y=0) while the foot drags backward (cos < 0); lifts in an arc
+	# while it swings forward (cos > 0).
+	return Vector2(WALK_STRIDE * sin(ph), -WALK_LIFT * maxf(0.0, cos(ph)))
 
 # ------------------------------------------------------------- IK ---
 
@@ -105,11 +138,10 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 	# space. Foot y is always <= 0 so nothing dips below the ground.
 	match anim:
 		"walk":
-			var p := t * 8.0
 			return {
-				"hip": 52.0,
-				"front": _foot_cycle(p, 12.0, 16.0, 12.0),
-				"back": _foot_cycle(p + PI, -12.0, 16.0, 12.0),
+				"hip": 50.0 - 1.5 * cos(_walk_phase * 2.0),  # subtle bob
+				"front": _step_foot(_walk_phase),
+				"back": _step_foot(_walk_phase + PI),
 			}
 		"prejump":
 			return {"hip": 38.0, "front": Vector2(24, 0), "back": Vector2(-22, 0)}
@@ -124,21 +156,19 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 		_:  # idle — bladed fighting stance: staggered feet, angled legs
 			return {"hip": 52.0, "front": Vector2(27, 0), "back": Vector2(-25, 0)}
 
-func _foot_cycle(p: float, center_x: float, stride: float, lift: float) -> Vector2:
-	var s := sin(p)
-	return Vector2(center_x + stride * s, -lift * maxf(0.0, s))
+# (walk footwork is handled by _update_gait + _step_foot)
 
 func _targets_for(anim: String, t: float) -> Dictionary:
 	match anim:
 		"walk":
-			# Keep the guard up while advancing / retreating (weapons will
-			# redefine arm poses per-weapon later).
-			var sw := sin(t * 8.0) * 6.0
+			# Hold the guard with a subtle sway synced to the gait, and lean
+			# into the direction of travel. (Weapons redefine arms later.)
+			var sway := sin(_walk_phase) * 5.0
 			return {
-				"torso": 4.0,
-				"upper_arm_back": -50.0,
+				"torso": 5.0 * _move_sign,
+				"upper_arm_back": -50.0 - sway,
 				"lower_arm_back": -80.0,
-				"upper_arm_front": -56.0 + sw,
+				"upper_arm_front": -56.0 + sway,
 				"lower_arm_front": -72.0,
 			}
 		"prejump":

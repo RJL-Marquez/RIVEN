@@ -1,19 +1,296 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://actors/fighter/fighter.gd" id="1"]
-[ext_resource type="Script" path="res://actors/fighter/fighter_rig.gd" id="2"]
+[ext_resource type="Script" path="res://actors/fighter/fighter.gd" id="1_72gs3"]
 
-[sub_resource type="CapsuleShape2D" id="cap"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_q78e4"]
 radius = 16.0
 height = 100.0
 
-[node name="Fighter" type="CharacterBody2D"]
-script = ExtResource("1")
+[sub_resource type="Animation" id="Animation_l7ew3"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[sub_resource type="Animation" id="Animation_82kcb"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_75iw0"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_iexiq"]
+length = 1.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root/pelvis/torso:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-1.5707963267948966, -1.5184364492350666, -1.5707963267948966]
+}
+
+[sub_resource type="Animation" id="Animation_yk367"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_go0fw"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_lyinm"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_gtv2l"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_1ghra"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_euc1n"]
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rig/Root:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2v50a"]
+_data = {
+&"airflip": SubResource("Animation_l7ew3"),
+&"crouch": SubResource("Animation_82kcb"),
+&"handspring": SubResource("Animation_75iw0"),
+&"idle": SubResource("Animation_iexiq"),
+&"jump": SubResource("Animation_yk367"),
+&"land": SubResource("Animation_go0fw"),
+&"lunge": SubResource("Animation_lyinm"),
+&"prejump": SubResource("Animation_gtv2l"),
+&"roll": SubResource("Animation_1ghra"),
+&"walk": SubResource("Animation_euc1n")
+}
+
+[node name="Fighter" type="CharacterBody2D" unique_id=377766008]
+script = ExtResource("1_72gs3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=643750614]
 position = Vector2(0, -50)
-shape = SubResource("cap")
+shape = SubResource("CapsuleShape2D_q78e4")
 
-[node name="Rig" type="Node2D" parent="."]
-script = ExtResource("2")
-accent_color = Color(0.286, 0.761, 1, 1)
+[node name="Rig" type="Node2D" parent="." unique_id=858824927]
+
+[node name="Root" type="Node2D" parent="Rig" unique_id=273805289]
+
+[node name="pelvis" type="Node2D" parent="Rig/Root" unique_id=1357598364]
+
+[node name="torso" type="Node2D" parent="Rig/Root/pelvis" unique_id=1557795390]
+rotation = -1.5707964
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=1048539926]
+z_index = 5
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(6.123032e-16, 10, -5, 8.660254, -8.660254, 5, -10, 1.2246064e-15, -8.660254, -5, -5, -8.660254, -1.8369095e-15, -10, 44, -10, 49, -8.660254, 52.660255, -5, 54, 0, 52.660255, 5, 49, 8.660254, 44, 10)
+
+[node name="upper_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=512738236]
+position = Vector2(38, 0)
+rotation = 3.2288592
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=27602514]
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.1430611e-16, 3.5, -1.75, 3.0310888, -3.0310888, 1.75, -3.5, 4.2861222e-16, -3.0310888, -1.75, -1.75, -3.0310888, -6.4291834e-16, -3.5, 22, -3.5, 23.75, -3.0310888, 25.03109, -1.75, 25.5, 0, 25.03109, 1.75, 23.75, 3.0310888, 22, 3.5)
+
+[node name="lower_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=123791256]
+position = Vector2(22, 0)
+rotation = 0.13962634
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back" unique_id=981187323]
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(1.8369095e-16, 3, -1.5, 2.598076, -2.598076, 1.5, -3, 3.673819e-16, -2.598076, -1.5, -1.5, -2.598076, -5.5107286e-16, -3, 20, -3, 21.5, -2.598076, 22.598076, -1.5, 23, 0, 22.598076, 1.5, 21.5, 2.598076, 20, 3)
+
+[node name="upper_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1270657760]
+position = Vector2(38, 0)
+rotation = 3.0543263
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=331332482]
+z_index = 10
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.1430611e-16, 3.5, -1.75, 3.0310888, -3.0310888, 1.75, -3.5, 4.2861222e-16, -3.0310888, -1.75, -1.75, -3.0310888, -6.4291834e-16, -3.5, 22, -3.5, 23.75, -3.0310888, 25.03109, -1.75, 25.5, 0, 25.03109, 1.75, 23.75, 3.0310888, 22, 3.5)
+
+[node name="lower_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=1506797544]
+position = Vector2(22, 0)
+rotation = 0.13962634
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front" unique_id=1645379989]
+z_index = 10
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(1.8369095e-16, 3, -1.5, 2.598076, -2.598076, 1.5, -3, 3.673819e-16, -2.598076, -1.5, -1.5, -2.598076, -5.5107286e-16, -3, 20, -3, 21.5, -2.598076, 22.598076, -1.5, 23, 0, 22.598076, 1.5, 21.5, 2.598076, 20, 3)
+
+[node name="head" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1916867155]
+position = Vector2(44, 0)
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=787362227]
+z_index = 13
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(23, 0, 22.162674, 4.2095175, 19.778175, 7.7781744, 16.209518, 10.162675, 12, 11, 7.7904825, 10.162675, 4.2218256, 7.7781744, 1.8373251, 4.2095175, 1, 1.347067e-15, 1.8373251, -4.2095175, 4.2218256, -7.7781744, 7.7904825, -10.162675, 12, -11, 16.209518, -10.162675, 19.778175, -7.7781744, 22.162674, -4.2095175)
+
+[node name="eye" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=193804278]
+z_index = 22
+z_as_relative = false
+color = Color(0.28627452, 0.7607843, 1, 1)
+polygon = PackedVector2Array(18.6, -3, 18.402086, -2.005023, 17.838478, -1.1615225, 16.994976, -0.59791327, 16, -0.4000001, 15.005023, -0.59791327, 14.161523, -1.1615225, 13.597914, -2.005023, 13.4, -3, 13.597914, -3.994977, 14.161523, -4.8384776, 15.005023, -5.4020867, 16, -5.6, 16.994976, -5.4020867, 17.838478, -4.8384776, 18.402086, -3.994977)
+
+[node name="gem" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=4050799]
+z_index = 23
+z_as_relative = false
+color = Color(0.28627452, 0.7607843, 1, 1)
+polygon = PackedVector2Array(22, -4, 28, 0, 22, 4, 16, 0)
+
+[node name="upper_leg_back" type="Node2D" parent="Rig/Root/pelvis" unique_id=220990400]
+rotation = 1.6580628
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=1915449371]
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.7553643e-16, 4.5, -2.25, 3.8971143, -3.8971143, 2.25, -4.5, 5.5107286e-16, -3.8971143, -2.25, -2.25, -3.8971143, -8.266093e-16, -4.5, 30, -4.5, 32.25, -3.8971143, 33.897114, -2.25, 34.5, 0, 33.897114, 2.25, 32.25, 3.8971143, 30, 4.5)
+
+[node name="lower_leg_back" type="Node2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=2026567947]
+position = Vector2(30, 0)
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back/lower_leg_back" unique_id=133990940]
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.4492127e-16, 4, -2, 3.4641016, -3.4641016, 2, -4, 4.8984254e-16, -3.4641016, -2, -2, -3.4641016, -7.347638e-16, -4, 30, -4, 32, -3.4641016, 33.4641, -2, 34, 0, 33.4641, 2, 32, 3.4641016, 30, 4)
+
+[node name="upper_leg_front" type="Node2D" parent="Rig/Root/pelvis" unique_id=1202085290]
+rotation = 1.4835298
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=557179120]
+z_index = 10
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.7553643e-16, 4.5, -2.25, 3.8971143, -3.8971143, 2.25, -4.5, 5.5107286e-16, -3.8971143, -2.25, -2.25, -3.8971143, -8.266093e-16, -4.5, 30, -4.5, 32.25, -3.8971143, 33.897114, -2.25, 34.5, 0, 33.897114, 2.25, 32.25, 3.8971143, 30, 4.5)
+
+[node name="lower_leg_front" type="Node2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=1437171210]
+position = Vector2(30, 0)
+
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front/lower_leg_front" unique_id=794780049]
+z_index = 10
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(2.4492127e-16, 4, -2, 3.4641016, -3.4641016, 2, -4, 4.8984254e-16, -3.4641016, -2, -2, -3.4641016, -7.347638e-16, -4, 30, -4, 32, -3.4641016, 33.4641, -2, 34, 0, 33.4641, 2, 32, 3.4641016, 30, 4)
+
+[node name="hip" type="Polygon2D" parent="Rig/Root/pelvis" unique_id=1113228621]
+z_index = 4
+z_as_relative = false
+color = Color(0.08235294, 0.09019608, 0.12156863, 1)
+polygon = PackedVector2Array(11, 0, 10.162675, 4.2095175, 7.7781744, 7.7781744, 4.2095175, 10.162675, 6.735335e-16, 11, -4.2095175, 10.162675, -7.7781744, 7.7781744, -10.162675, 4.2095175, -11, 1.347067e-15, -10.162675, -4.2095175, -7.7781744, -7.7781744, -4.2095175, -10.162675, -2.0206005e-15, -11, 4.2095175, -10.162675, 7.7781744, -7.7781744, 10.162675, -4.2095175)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1099166126]
+libraries/ = SubResource("AnimationLibrary_2v50a")

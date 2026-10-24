@@ -5,8 +5,7 @@
 [resource]
 script = ExtResource("1_vwn1l")
 kind = "handspring"
-speed = 0.0
 time = 0.5
-recovery = 0.1
+recovery = 0.12
 spin = 1.0
 anim = "handspring"

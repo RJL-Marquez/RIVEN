@@ -1,15 +1,15 @@
 class_name Fighter
 extends CharacterBody2D
-## Phase 1 fighter: grounded, deliberate movement plus acrobatic special
-## maneuvers triggered by input combos (all relative to facing, which is
-## opponent-relative):
-##   double-tap forward  -> lunge
-##   double-tap back     -> back handspring (flick)
-##   jump + forward      -> front flip (airborne)
-##   jump + back         -> back flip (airborne)
-##   crouch + forward    -> front roll (grounded)
-##   crouch + back       -> back roll (grounded, faster)
-## Each maneuver is a data-driven DashStyle asset in actors/fighter/moves/.
+## Phase 1 fighter. Movement, state machine, and the input-combo special moves
+## live here; the POSES are authored visually in the AnimationPlayer (one
+## animation per state: idle / walk / crouch / prejump / jump / land / lunge /
+## handspring / airflip / roll). This script just plays the animation that
+## matches the current state and moves the body.
+##
+## Input combos (relative to facing, which is opponent-relative):
+##   double-tap forward / back -> lunge / back handspring
+##   jump + forward / back     -> front / back flip
+##   crouch + forward / back   -> front / back roll
 
 @export_group("Movement feel")
 @export var walk_speed := 190.0
@@ -35,21 +35,20 @@ extends CharacterBody2D
 enum State { IDLE, WALK, CROUCH, PREJUMP, JUMP, MOVE, LAND }
 
 const MOVES := "res://actors/fighter/moves/"
-const HANDSPRING_TRAVEL := 264.0   # 2 * FighterRig.FLIP_LEN; baked in at move end
 
 var facing := 1
 var state: State = State.IDLE
 
 var _state_time := 0.0
 var _dash_dir := 1
-var _spin_sign := 1
 var _active: DashStyle
 var _launched := false
 var _time := 0.0
 var _last_tap := {-1: -999.0, 1: -999.0}
 var _opponent: Node2D
 
-@onready var rig: FighterRig = $Rig
+@onready var rig: Node2D = $Rig
+@onready var anim: AnimationPlayer = $AnimationPlayer
 
 func _ready() -> void:
 	if opponent_path != NodePath(""):
@@ -93,7 +92,6 @@ func _try_specials(move: float) -> bool:
 	var d := -1 if move < 0.0 else 1
 	var has_dir := absf(move) > 0.3
 
-	# double-tap a direction -> lunge (forward) / back handspring (back)
 	for dir in [-1, 1]:
 		var action := "move_left" if dir == -1 else "move_right"
 		if Input.is_action_just_pressed(action):
@@ -102,12 +100,10 @@ func _try_specials(move: float) -> bool:
 				return true
 			_last_tap[dir] = _time
 
-	# jump + direction -> front / back flip (airborne)
 	if has_dir and Input.is_action_just_pressed("jump"):
 		_start_move(move_air_flip, d)
 		return true
 
-	# crouch + direction -> front / back roll (grounded)
 	if has_dir and Input.is_action_just_pressed("crouch"):
 		_start_move(move_roll_fwd if d == facing else move_roll_back, d)
 		return true
@@ -117,9 +113,7 @@ func _try_specials(move: float) -> bool:
 func _start_move(m: DashStyle, dir: int) -> void:
 	_active = m
 	_dash_dir = dir
-	_spin_sign = dir
-	# Airborne moves (flips) wind up with a short crouch before launching;
-	# grounded moves start immediately.
+	# Airborne moves (flips) wind up with a short crouch before launching.
 	_launched = m.up <= 0.0
 	velocity.x = (dir * m.speed) if m.up <= 0.0 else 0.0
 	_set_state(State.MOVE)
@@ -168,7 +162,6 @@ func _state_move() -> void:
 	var s := _active
 	var airborne := s.up > 0.0
 
-	# Airborne moves get a short crouch wind-up before launch (gather momentum).
 	if airborne and not _launched:
 		velocity.x = 0.0
 		if _state_time >= prejump_time:
@@ -177,32 +170,16 @@ func _state_move() -> void:
 			_launched = true
 		return
 
-	if s.spin > 0.0:
-		var dur := (2.0 * s.up / gravity) if airborne else s.time
-		var elapsed := (_state_time - prejump_time) if airborne else _state_time
-		var prog := clampf(elapsed / maxf(dur, 0.05), 0.0, 1.0)
-		rig.set_spin(float(_spin_sign) * s.spin * TAU * prog)
 	if airborne:
 		velocity.x = _dash_dir * s.speed
 		if (_state_time - prejump_time) > 0.1 and is_on_floor() and velocity.y >= 0.0:
-			rig.set_spin(0.0)
 			_set_state(State.LAND)
 	else:
-		if s.kind == "handspring":
-			# Travel comes from the glued-hands pivot geometry (the rig moves the
-			# visual across the floor); bake that displacement into the body at
-			# the end so the collision follows without a mid-move slide.
-			velocity.x = 0.0
-			if _state_time > s.time:
-				position.x += HANDSPRING_TRAVEL * float(_spin_sign)
-				rig.set_spin(0.0)
-				_set_state(State.IDLE)
-		elif _state_time <= s.time:
+		if _state_time <= s.time:
 			velocity.x = _dash_dir * s.speed
 		elif _state_time <= s.time + s.recovery:
 			velocity.x = 0.0
 		else:
-			rig.set_spin(0.0)
 			_set_state(State.IDLE)
 
 func _state_land() -> void:
@@ -222,15 +199,17 @@ func _update_facing() -> void:
 	rig.scale.x = facing
 
 func _update_anim() -> void:
+	var name := "idle"
 	match state:
-		State.WALK: rig.set_anim("walk")
-		State.CROUCH: rig.set_anim("crouch")
-		State.PREJUMP: rig.set_anim("prejump")
-		State.JUMP: rig.set_anim("jump")
-		State.MOVE:
-			if _active != null and _active.up > 0.0 and not _launched:
-				rig.set_anim("prejump")
-			else:
-				rig.set_anim(_active.anim if _active else "idle")
-		State.LAND: rig.set_anim("land")
-		_: rig.set_anim("idle")
+		State.WALK: name = "walk"
+		State.CROUCH: name = "crouch"
+		State.PREJUMP: name = "prejump"
+		State.JUMP: name = "jump"
+		State.LAND: name = "land"
+		State.MOVE: name = (_active.anim if _active else "idle")
+		_: name = "idle"
+	_play(name)
+
+func _play(anim_name: String) -> void:
+	if anim.has_animation(anim_name) and anim.current_animation != anim_name:
+		anim.play(anim_name)

@@ -102,8 +102,8 @@ func _process(delta: float) -> void:
 		rotation = _spin
 		var half := ROLL_LEN * 0.5
 		position = Vector2(-half * sin(_spin), -ROLL_LEN * maxf(0.0, -cos(_spin)))
-		bones["pelvis"].position.y = -32.0
-		_curl_legs(tf)
+		bones["pelvis"].position.y = -40.0
+		_curl_legs(tf * 0.55)
 	elif _anim == "airflip":
 		# Airborne somersault about the body center; the tuck eases in to the
 		# middle of the flip and opens back out before landing.
@@ -288,11 +288,11 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 			# Curl the head toward the knees, eased in toward the middle of the roll.
 			var tfr := _spin_tuck()
 			return {
-				"torso": 135.0 * tfr,
-				"upper_arm_back": -60.0 * tfr,
-				"lower_arm_back": -120.0 * tfr,
-				"upper_arm_front": -60.0 * tfr,
-				"lower_arm_front": -120.0 * tfr,
+				"torso": 80.0 * tfr,
+				"upper_arm_back": -35.0 * tfr,
+				"lower_arm_back": -70.0 * tfr,
+				"upper_arm_front": -35.0 * tfr,
+				"lower_arm_front": -70.0 * tfr,
 			}
 		_:  # idle — hands-up fighting guard + subtle breathing
 			var br := sin(t * 2.2) * 2.0

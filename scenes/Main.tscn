@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[node name="Main" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="UI"]
+offset_left = 480.0
+offset_top = 40.0
+offset_right = 800.0
+offset_bottom = 72.0
+text = "RIVEN — Phase 0 foundation"
+horizontal_alignment = 1

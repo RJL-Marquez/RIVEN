@@ -17,3 +17,6 @@ mono_crash.*.json
 # Build / export output
 builds/
 *.tmp
+
+# Local reference material (not part of the game)
+_refs/

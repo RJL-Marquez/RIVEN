@@ -31,7 +31,7 @@ const WALK_LIFT := 4.0        # low shuffle lift
 # max(0, -cos(angle)) so the leading end rides the ground and nothing clips
 # below it. FLIP_LEN = feet-to-overhead-hands; ROLL_LEN = tuck radius.
 const FLIP_LEN := 132.0
-const ROLL_R := 34.0          # tuck radius for center-pivot rolls
+const ROLL_LEN := 70.0        # tuck length for ground-rolling rolls
 
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
@@ -89,11 +89,13 @@ func _process(delta: float) -> void:
 		bones["pelvis"].position.y = -54.0
 		_handspring_legs()
 	elif _anim == "roll":
-		# Compact ball rotating about its center of gravity; travel from velocity.
+		# Tucked body rolling ALONG the ground: the lowest point rides the floor
+		# and the body tumbles over it (and travels via velocity), instead of a
+		# ball spinning at a fixed height.
 		rotation = _spin
-		var rc := Vector2(0.0, -ROLL_R)
-		position = rc - rc.rotated(_spin)
-		bones["pelvis"].position.y = -ROLL_R
+		var half := ROLL_LEN * 0.5
+		position = Vector2(-half * sin(_spin), -ROLL_LEN * maxf(0.0, -cos(_spin)))
+		bones["pelvis"].position.y = -half
 		_tuck_legs()
 	elif _anim == "airflip":
 		# Airborne somersault: rotate the body about its own center (the body is

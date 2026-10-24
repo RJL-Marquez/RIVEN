@@ -128,10 +128,7 @@ func _make_anim(anim_name: String) -> Animation:
 	var keys: Array = data["keys"]
 
 	var bones_used := {}
-	var use_root := false
 	for k in keys:
-		if float(k.get("root_rot", 0.0)) != 0.0 or k.get("root_pos", Vector2.ZERO) != Vector2.ZERO:
-			use_root = true
 		for b in k.get("off", {}).keys():
 			bones_used[b] = true
 
@@ -140,15 +137,17 @@ func _make_anim(anim_name: String) -> Animation:
 	for k in keys:
 		a.track_insert_key(tp, k["t"], Vector2(0, float(k.get("pelvis", PELVIS_Y))))
 
-	if use_root:
-		var tr := a.add_track(Animation.TYPE_VALUE)
-		a.track_set_path(tr, "Rig/Root:rotation")
-		for k in keys:
-			a.track_insert_key(tr, k["t"], deg_to_rad(float(k.get("root_rot", 0.0))))
-		var tpos := a.add_track(Animation.TYPE_VALUE)
-		a.track_set_path(tpos, "Rig/Root:position")
-		for k in keys:
-			a.track_insert_key(tpos, k["t"], k.get("root_pos", Vector2.ZERO))
+	# Always drive Root so every animation resets the whole body to its proper
+	# orientation/position (otherwise idle/walk inherit a flip's leftover pose
+	# and the fighter ends up floating or lying down).
+	var tr := a.add_track(Animation.TYPE_VALUE)
+	a.track_set_path(tr, "Rig/Root:rotation")
+	for k in keys:
+		a.track_insert_key(tr, k["t"], deg_to_rad(float(k.get("root_rot", 0.0))))
+	var tpos := a.add_track(Animation.TYPE_VALUE)
+	a.track_set_path(tpos, "Rig/Root:position")
+	for k in keys:
+		a.track_insert_key(tpos, k["t"], k.get("root_pos", Vector2.ZERO))
 
 	for b in bones_used.keys():
 		var tb := a.add_track(Animation.TYPE_VALUE)

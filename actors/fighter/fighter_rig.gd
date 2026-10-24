@@ -154,13 +154,13 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 			}
 		"crouch":
 			return {
-				"torso": 16.0,
-				"upper_leg_back": 28.0,
-				"upper_leg_front": -28.0,
-				"lower_leg_back": 26.0,
-				"lower_leg_front": 26.0,
-				"upper_arm_back": -10.0,
-				"upper_arm_front": -10.0,
+				"torso": 24.0,
+				"upper_leg_back": 50.0,
+				"upper_leg_front": -50.0,
+				"lower_leg_back": 70.0,
+				"lower_leg_front": 70.0,
+				"upper_arm_back": -4.0,
+				"upper_arm_front": -4.0,
 			}
 		"jump":
 			return {
@@ -202,7 +202,7 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 
 func _vert_for(anim: String) -> float:
 	match anim:
-		"crouch": return 18.0
-		"land": return 8.0
+		"crouch": return 40.0
+		"land": return 10.0
 		"jump": return -2.0
 		_: return 0.0

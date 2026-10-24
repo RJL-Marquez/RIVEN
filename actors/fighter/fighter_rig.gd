@@ -23,15 +23,15 @@ const THIGH := 30.0
 const SHIN := 30.0
 
 # Walk gait (distance-phased so feet track the ground instead of skating).
-const WALK_STEP_LEN := 18.0   # body px advanced per radian of gait
-const WALK_STRIDE := 26.0     # foot forward/back reach
-const WALK_LIFT := 14.0       # swing-foot lift height
+const WALK_STEP_LEN := 12.0   # body px advanced per radian of gait
+const WALK_STRIDE := 8.0      # small shuffle reach (stance strafe)
+const WALK_LIFT := 4.0        # low shuffle lift
 
 # Spinning dashes (roll/flip) rotate about the feet then lift by this length *
 # max(0, -cos(angle)) so the leading end rides the ground and nothing clips
 # below it. FLIP_LEN = feet-to-overhead-hands; ROLL_LEN = tuck radius.
 const FLIP_LEN := 132.0
-const ROLL_LEN := 56.0
+const ROLL_R := 34.0          # tuck radius for center-pivot rolls
 
 # name, parent (""=rig root), pos (offset from parent origin), rest angle (deg),
 # limb length, limb width. Leg bone rotations are overridden each frame by IK.
@@ -79,16 +79,21 @@ func _process(delta: float) -> void:
 	_update_gait()
 
 	if _anim == "handspring":
-		# Back handspring: spin about the feet, then lift so the leading end
-		# (overhead hands) rides the ground and the body never clips below it.
+		# Back handspring: rotate about the body mid-point (flips in place
+		# instead of swinging off a pinned foot) and clamp the lowest end to the
+		# ground, so it passes through a true hands-down handstand with no clip
+		# and no teleport. Travel comes from the move's velocity.
 		rotation = _spin
-		position.y = -FLIP_LEN * maxf(0.0, -cos(_spin))
+		var half := FLIP_LEN * 0.5
+		position = Vector2(-half * sin(_spin), -FLIP_LEN * maxf(0.0, -cos(_spin)))
 		bones["pelvis"].position.y = -54.0
 		_handspring_legs()
 	elif _anim == "roll":
+		# Compact ball rotating about its center of gravity; travel from velocity.
 		rotation = _spin
-		position.y = -ROLL_LEN * maxf(0.0, -cos(_spin))
-		bones["pelvis"].position.y = -34.0
+		var rc := Vector2(0.0, -ROLL_R)
+		position = rc - rc.rotated(_spin)
+		bones["pelvis"].position.y = -ROLL_R
 		_tuck_legs()
 	elif _anim == "airflip":
 		# Airborne somersault: rotate the body about its own center (the body is
@@ -158,8 +163,8 @@ func _apply_leg(prefix: String, foot_rig: Vector2) -> void:
 
 func _tuck_legs() -> void:
 	for side in ["front", "back"]:
-		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-45.0)
-		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(90.0)
+		bones["upper_leg_" + side].rotation = rest_rot["upper_leg_" + side] + deg_to_rad(-55.0)
+		bones["lower_leg_" + side].rotation = rest_rot["lower_leg_" + side] + deg_to_rad(110.0)
 
 func _handspring_legs() -> void:
 	# Near-straight legs with a slight knee, for an arched handspring line.
@@ -184,9 +189,9 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 	match anim:
 		"walk":
 			return {
-				"hip": 50.0 - 1.5 * cos(_walk_phase * 2.0),  # subtle bob
-				"front": _step_foot(_walk_phase),
-				"back": _step_foot(_walk_phase + PI),
+				"hip": 52.0,
+				"front": Vector2(20, 0) + _step_foot(_walk_phase),
+				"back": Vector2(-20, 0) + _step_foot(_walk_phase + PI),
 			}
 		"prejump":
 			return {"hip": 38.0, "front": Vector2(24, 0), "back": Vector2(-22, 0)}
@@ -199,7 +204,7 @@ func _leg_targets(anim: String, t: float) -> Dictionary:
 		"land":
 			return {"hip": 42.0, "front": Vector2(16, 0), "back": Vector2(-16, 0)}
 		"lunge":
-			return {"hip": 44.0, "front": Vector2(34, 0), "back": Vector2(-30, 0)}
+			return {"hip": 42.0, "front": Vector2(38, 0), "back": Vector2(-32, 0)}
 		_:  # idle — bladed fighting stance: staggered feet, angled legs
 			return {"hip": 52.0, "front": Vector2(27, 0), "back": Vector2(-25, 0)}
 
@@ -262,13 +267,13 @@ func _targets_for(anim: String, t: float) -> Dictionary:
 				"lower_arm_front": -112.0,
 			}
 		"roll":
-			# Tuck into a ball.
+			# Curl tightly into a ball (head tucked toward the knees).
 			return {
-				"torso": 26.0,
-				"upper_arm_back": -70.0,
-				"lower_arm_back": -110.0,
-				"upper_arm_front": -70.0,
-				"lower_arm_front": -110.0,
+				"torso": 130.0,
+				"upper_arm_back": -60.0,
+				"lower_arm_back": -120.0,
+				"upper_arm_front": -60.0,
+				"lower_arm_front": -120.0,
 			}
 		_:  # idle — hands-up fighting guard + subtle breathing
 			var br := sin(t * 2.2) * 2.0

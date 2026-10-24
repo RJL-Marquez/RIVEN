@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_1sabt")
 kind = "airflip"
-speed = 280.0
+speed = 320.0
 time = 0.0
 recovery = 0.1
-up = 560.0
+up = 420.0
 spin = 1.0
 anim = "airflip"

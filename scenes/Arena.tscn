@@ -15,7 +15,7 @@ layer = -1
 [node name="BG" type="ColorRect" parent="Background"]
 offset_right = 1280.0
 offset_bottom = 720.0
-color = Color(0.07, 0.08, 0.12, 1)
+color = Color(0.78, 0.8, 0.84, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(640, 360)
@@ -27,11 +27,11 @@ position = Vector2(640, 620)
 shape = SubResource("ground")
 
 [node name="GroundVis" type="Polygon2D" parent="Ground"]
-color = Color(0.11, 0.12, 0.17, 1)
+color = Color(0.6, 0.62, 0.66, 1)
 polygon = PackedVector2Array(-800, -60, 800, -60, 800, 60, -800, 60)
 
 [node name="GroundLine" type="Polygon2D" parent="Ground"]
-color = Color(0.286, 0.761, 1, 0.25)
+color = Color(0.1, 0.4, 0.7, 0.5)
 polygon = PackedVector2Array(-800, -60, 800, -60, 800, -56, -800, -56)
 
 [node name="Fighter" parent="." instance=ExtResource("2")]
@@ -52,12 +52,12 @@ offset_left = 16.0
 offset_top = 12.0
 offset_right = 380.0
 offset_bottom = 140.0
-theme_override_colors/font_color = Color(0.56, 0.85, 1, 1)
+theme_override_colors/font_color = Color(0.1, 0.14, 0.22, 1)
 
 [node name="Hint" type="Label" parent="HUD"]
 offset_left = 16.0
 offset_top = 666.0
 offset_right = 1260.0
 offset_bottom = 710.0
-theme_override_colors/font_color = Color(0.5, 0.55, 0.66, 1)
+theme_override_colors/font_color = Color(0.25, 0.28, 0.35, 1)
 text = "A / D  or  < / >   move      W / Up / Space   jump      S / Down   crouch      double-tap a direction = step-dash      (grey marker = opponent you always face)"

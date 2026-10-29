@@ -9,4 +9,4 @@ speed = 340.0
 time = 0.52
 recovery = 0.14
 spin = 1.0
-anim = "roll"
+anim = "crouchmove/roll"

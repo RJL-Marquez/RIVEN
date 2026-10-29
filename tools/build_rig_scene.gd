@@ -49,6 +49,14 @@ const GUARD := {"upper_arm_back": -52.0, "lower_arm_back": -82.0, "upper_arm_fro
 const STANCE := {"upper_leg_back": 8.0, "lower_leg_back": 8.0, "upper_leg_front": -8.0, "lower_leg_front": 8.0}
 
 const ANIMS := ["idle", "walk", "crouch", "prejump", "jump", "land", "lunge", "handspring", "airflip", "roll"]
+# Which library (folder) each animation goes in.
+const ANIM_LIBS := {
+	"idle": "idle",
+	"walk": "movement", "crouch": "movement", "prejump": "movement", "jump": "movement", "land": "movement",
+	"lunge": "dash", "handspring": "dash",
+	"airflip": "jumpmove",
+	"roll": "crouchmove",
+}
 
 func _initialize() -> void:
 	var fighter := CharacterBody2D.new()
@@ -105,10 +113,14 @@ func _initialize() -> void:
 	var ap := AnimationPlayer.new()
 	ap.name = "AnimationPlayer"
 	fighter.add_child(ap)
-	var lib := AnimationLibrary.new()
+	var libs := {}
 	for a in ANIMS:
-		lib.add_animation(a, _make_anim(a))
-	ap.add_animation_library("", lib)
+		var ln: String = ANIM_LIBS[a]
+		if not libs.has(ln):
+			libs[ln] = AnimationLibrary.new()
+		libs[ln].add_animation(a, _make_anim(a))
+	for ln in libs.keys():
+		ap.add_animation_library(ln, libs[ln])
 
 	_set_owner_recursive(fighter, fighter)
 	var packed := PackedScene.new()

@@ -8,4 +8,4 @@ kind = "handspring"
 time = 0.5
 recovery = 0.12
 spin = 1.0
-anim = "handspring"
+anim = "dash/handspring"

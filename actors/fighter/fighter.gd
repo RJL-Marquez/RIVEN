@@ -199,15 +199,15 @@ func _update_facing() -> void:
 	rig.scale.x = facing
 
 func _update_anim() -> void:
-	var name := "idle"
+	var name := "idle/idle"
 	match state:
-		State.WALK: name = "walk"
-		State.CROUCH: name = "crouch"
-		State.PREJUMP: name = "prejump"
-		State.JUMP: name = "jump"
-		State.LAND: name = "land"
-		State.MOVE: name = (_active.anim if _active else "idle")
-		_: name = "idle"
+		State.WALK: name = "movement/walk"
+		State.CROUCH: name = "movement/crouch"
+		State.PREJUMP: name = "movement/prejump"
+		State.JUMP: name = "movement/jump"
+		State.LAND: name = "movement/land"
+		State.MOVE: name = (_active.anim if _active else "idle/idle")
+		_: name = "idle/idle"
 	_play(name)
 
 func _play(anim_name: String) -> void:

@@ -7,4 +7,4 @@ script = ExtResource("1_qqion")
 kind = "lunge"
 time = 0.22
 recovery = 0.16
-anim = "lunge"
+anim = "dash/lunge"

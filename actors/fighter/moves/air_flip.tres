@@ -10,4 +10,4 @@ time = 0.0
 recovery = 0.1
 up = 420.0
 spin = 1.0
-anim = "airflip"
+anim = "jumpmove/airflip"

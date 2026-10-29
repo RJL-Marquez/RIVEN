@@ -12,7 +12,7 @@ config_version=5
 
 config/name="RIVEN"
 config/description="A weighty, tactical 1v1 fantasy duel fighter in the Shadow Fight tradition."
-run/main_scene="res://scenes/Arena.tscn"
+run/main_scene="res://scenes/Arena3D.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

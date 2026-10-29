@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://actors/fighter3d/Fighter3D.tscn" id="1"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.776, 0.792, 0.824, 1)
+ambient_light_color = Color(0.6, 0.62, 0.66, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="BoxShape3D" id="GroundShape"]
+size = Vector3(40, 0.2, 10)
+
+[sub_resource type="PlaneMesh" id="Plane"]
+size = Vector2(40, 10)
+
+[sub_resource type="StandardMaterial3D" id="GMat"]
+albedo_color = Color(0.553, 0.576, 0.627, 1)
+
+[sub_resource type="CapsuleMesh" id="OppMesh"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="OppMat"]
+albedo_color = Color(0.4, 0.42, 0.5, 1)
+
+[node name="Arena3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
+projection = 1
+size = 4.0
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 2, 6, 4)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="Col" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("GroundShape")
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("Plane")
+material_override = SubResource("GMat")
+
+[node name="Fighter3D" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0)
+opponent_path = NodePath("../Opponent")
+
+[node name="Opponent" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Opponent"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("OppMesh")
+material_override = SubResource("OppMat")

@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://actors/fighter3d/fighter3d.gd" id="1"]
+
+[sub_resource type="CapsuleShape3D" id="Cap"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapMesh"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.082, 0.09, 0.122, 1)
+
+[node name="Fighter3D" type="CharacterBody3D"]
+script = ExtResource("1")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("Cap")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Mesh" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapMesh")
+material_override = SubResource("Mat")

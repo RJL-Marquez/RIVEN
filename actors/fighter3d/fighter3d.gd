@@ -11,7 +11,7 @@ extends CharacterBody3D
 
 ## Height tweak: raise this if the feet clip INTO the floor, lower it (even
 ## negative) if they FLOAT above it. Editable in the Inspector.
-@export var foot_offset := 0.05
+@export var foot_offset := -0.02
 
 var facing := 1
 var _opponent: Node3D

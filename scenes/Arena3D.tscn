@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://cf433m5vh5kdl"]
 
 [ext_resource type="PackedScene" path="res://actors/fighter3d/Fighter3D.tscn" id="1"]
 
@@ -8,55 +8,55 @@ background_color = Color(0.776, 0.792, 0.824, 1)
 ambient_light_color = Color(0.62, 0.64, 0.68, 1)
 ambient_light_energy = 0.6
 
-[sub_resource type="BoxShape3D" id="GroundShape"]
-size = Vector3(60, 0.2, 20)
+[sub_resource type="StandardMaterial3D" id="GMat"]
+shading_mode = 2
+albedo_color = Color(0.5, 0.5, 0.52, 1)
 
 [sub_resource type="QuadMesh" id="FloorBand"]
 size = Vector2(60, 14)
 
-[sub_resource type="StandardMaterial3D" id="GMat"]
-shading_mode = 2
-albedo_color = Color(0.5, 0.5, 0.52, 1)
+[sub_resource type="BoxShape3D" id="GroundShape"]
+size = Vector3(60, 0.2, 20)
+
+[sub_resource type="StandardMaterial3D" id="OppMat"]
+albedo_color = Color(0.4, 0.42, 0.5, 1)
 
 [sub_resource type="CapsuleMesh" id="OppMesh"]
 radius = 0.3
 height = 1.8
 
-[sub_resource type="StandardMaterial3D" id="OppMat"]
-albedo_color = Color(0.4, 0.42, 0.5, 1)
+[node name="Arena3D" type="Node3D" unique_id=1538534640]
 
-[node name="Arena3D" type="Node3D"]
-
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1629783265]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
 projection = 1
 size = 4.6
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1590734073]
 transform = Transform3D(0.94, -0.17, 0.3, 0, 0.87, 0.5, -0.34, -0.47, 0.82, 0, 8, 4)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=686095164]
 environment = SubResource("Env")
 
-[node name="Floor" type="MeshInstance3D" parent="."]
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1576331545]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -7, -3)
-mesh = SubResource("FloorBand")
 material_override = SubResource("GMat")
+mesh = SubResource("FloorBand")
 
-[node name="Ground" type="StaticBody3D" parent="."]
+[node name="Ground" type="StaticBody3D" parent="." unique_id=1374432511]
 
-[node name="Col" type="CollisionShape3D" parent="Ground"]
+[node name="Col" type="CollisionShape3D" parent="Ground" unique_id=395573110]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 shape = SubResource("GroundShape")
 
-[node name="Fighter3D" parent="." instance=ExtResource("1")]
+[node name="Fighter3D" parent="." unique_id=976034599 instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0)
 opponent_path = NodePath("../Opponent")
 
-[node name="Opponent" type="Node3D" parent="."]
+[node name="Opponent" type="Node3D" parent="." unique_id=422184646]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Opponent"]
+[node name="Mesh" type="MeshInstance3D" parent="Opponent" unique_id=955423624]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("OppMesh")
 material_override = SubResource("OppMat")
+mesh = SubResource("OppMesh")

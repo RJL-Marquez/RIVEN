@@ -46,7 +46,7 @@ const PATHS := {
 	"lower_leg_front": "Rig/Root/pelvis/upper_leg_front/lower_leg_front",
 }
 const GUARD := {"upper_arm_back": -52.0, "lower_arm_back": -82.0, "upper_arm_front": -58.0, "lower_arm_front": -74.0}
-const STANCE := {"upper_leg_back": 8.0, "lower_leg_back": 8.0, "upper_leg_front": -8.0, "lower_leg_front": 8.0}
+const STANCE := {"upper_leg_back": 8.0, "lower_leg_back": -8.0, "upper_leg_front": -8.0, "lower_leg_front": 8.0}
 
 const ANIMS := ["idle", "walk", "crouch", "prejump", "jump", "land", "lunge", "handspring", "airflip", "roll"]
 # Which library (folder) each animation goes in.
@@ -177,7 +177,7 @@ func _anim_data(anim_name: String) -> Dictionary:
 			var low := _m([GUARD, STANCE, {"torso": 6.0}])
 			var high := _m([
 				{"upper_arm_back": -55.0, "lower_arm_back": -84.0, "upper_arm_front": -61.0, "lower_arm_front": -76.0},
-				{"upper_leg_back": 9.0, "lower_leg_back": 10.0, "upper_leg_front": -9.0, "lower_leg_front": 10.0},
+				{"upper_leg_back": 9.0, "lower_leg_back": -10.0, "upper_leg_front": -9.0, "lower_leg_front": 10.0},
 				{"torso": 9.0},
 			])
 			return {"length": 1.4, "loop": true, "keys": [

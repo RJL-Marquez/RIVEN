@@ -36,6 +36,21 @@ enum State { IDLE, WALK, CROUCH, PREJUMP, JUMP, MOVE, LAND }
 
 const MOVES := "res://actors/fighter/moves/"
 
+# Points (node path + local offset to the limb's lower edge) sampled each frame
+# to find the body's lowest point, so it can be pinned to the ground.
+const GROUND_SAMPLES := [
+	["Rig/Root/pelvis/upper_leg_front/lower_leg_front", Vector2(30, 4)],
+	["Rig/Root/pelvis/upper_leg_back/lower_leg_back", Vector2(30, 4)],
+	["Rig/Root/pelvis/upper_leg_front/lower_leg_front", Vector2(0, 5)],
+	["Rig/Root/pelvis/upper_leg_back/lower_leg_back", Vector2(0, 5)],
+	["Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front", Vector2(20, 3)],
+	["Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back", Vector2(20, 3)],
+	["Rig/Root/pelvis/torso/head", Vector2(12, 11)],
+	["Rig/Root/pelvis", Vector2(0, 11)],
+	["Rig/Root/pelvis/torso", Vector2(22, 10)],
+	["Rig/Root/pelvis/torso", Vector2(44, 10)],
+]
+
 var facing := 1
 var state: State = State.IDLE
 
@@ -46,6 +61,7 @@ var _launched := false
 var _time := 0.0
 var _last_tap := {-1: -999.0, 1: -999.0}
 var _opponent: Node2D
+var _ground_nodes: Array = []
 
 @onready var rig: Node2D = $Rig
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -58,6 +74,11 @@ func _ready() -> void:
 	if move_air_flip == null: move_air_flip = load(MOVES + "air_flip.tres")
 	if move_roll_fwd == null: move_roll_fwd = load(MOVES + "roll_fwd.tres")
 	if move_roll_back == null: move_roll_back = load(MOVES + "roll_back.tres")
+	process_priority = 100  # run _ground_clamp after the AnimationPlayer poses the body
+	for s in GROUND_SAMPLES:
+		var n := get_node_or_null(NodePath(s[0]))
+		if n:
+			_ground_nodes.append([n, s[1]])
 
 func _physics_process(delta: float) -> void:
 	_time += delta
@@ -213,3 +234,21 @@ func _update_anim() -> void:
 func _play(anim_name: String) -> void:
 	if anim.has_animation(anim_name) and anim.current_animation != anim_name:
 		anim.play(anim_name)
+
+func _process(_delta: float) -> void:
+	_ground_clamp()
+
+func _ground_clamp() -> void:
+	# Solid floor: when on the ground, shift the rig vertically so the body's
+	# lowest sampled point sits exactly on the ground — never clipping below it,
+	# never floating above it. Left alone while airborne.
+	rig.position.y = 0.0
+	if not is_on_floor() or _ground_nodes.is_empty():
+		return
+	var ground_y := global_position.y
+	var lowest := -1.0e20
+	for s in _ground_nodes:
+		var wy: float = (s[0] as Node2D).to_global(s[1]).y
+		if wy > lowest:
+			lowest = wy
+	rig.position.y = ground_y - lowest

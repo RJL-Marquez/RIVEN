@@ -9,11 +9,11 @@ extends CharacterBody3D
 @export var jump_velocity := 7.0
 @export var opponent_path: NodePath
 
-const FOOT_OFFSET := 0.03  # lowest bone sits this far above the floor (sole thickness)
+const FOOT_OFFSET := 0.0  # extra gap between the mesh's lowest point and the floor
 
 var facing := 1
 var _opponent: Node3D
-var _skeleton: Skeleton3D
+var _mesh: MeshInstance3D
 
 @onready var model: Node3D = $Model
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 		if a:
 			a.loop_mode = Animation.LOOP_LINEAR
 		ap.play("mixamo_com")
-	_skeleton = $Model/Character.get_node_or_null("Skeleton3D")
+	_mesh = $Model/Character/Skeleton3D.get_node_or_null("Beta_Surface") as MeshInstance3D
 	process_priority = 100  # run _ground_clamp after the animation poses the skeleton
 
 func _physics_process(delta: float) -> void:
@@ -54,15 +54,10 @@ func _process(_delta: float) -> void:
 
 func _ground_clamp() -> void:
 	# Plant the character on the floor: when grounded, shift the model so the
-	# skeleton's lowest bone sits just above the ground (no float, no sink).
+	# mesh's lowest surface point sits on the ground (no float, no clipping).
 	model.position.y = 0.0
-	if not is_on_floor() or _skeleton == null:
+	if not is_on_floor() or _mesh == null:
 		return
 	var ground_y := global_position.y
-	var lowest := 1.0e20
-	var st := _skeleton.global_transform
-	for i in _skeleton.get_bone_count():
-		var wy: float = (st * _skeleton.get_bone_global_pose(i).origin).y
-		if wy < lowest:
-			lowest = wy
-	model.position.y = ground_y + FOOT_OFFSET - lowest
+	var world_aabb := _mesh.global_transform * _mesh.get_aabb()
+	model.position.y = ground_y + FOOT_OFFSET - world_aabb.position.y

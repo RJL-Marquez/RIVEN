@@ -47,6 +47,14 @@ const PATHS := {
 }
 const GUARD := {"upper_arm_back": -52.0, "lower_arm_back": -82.0, "upper_arm_front": -58.0, "lower_arm_front": -74.0}
 const STANCE := {"upper_leg_back": 8.0, "lower_leg_back": -8.0, "upper_leg_front": -8.0, "lower_leg_front": 8.0}
+# The lowered combat stance — the base pose for idle and regular movement.
+const COMBAT := {
+	"torso": 7.0,
+	"upper_arm_front": -78.0, "lower_arm_front": -62.0,
+	"upper_arm_back": -25.0, "lower_arm_back": -90.0,
+	"upper_leg_front": -54.0, "lower_leg_front": 77.0,
+	"upper_leg_back": -30.0, "lower_leg_back": 77.0,
+}
 
 const ANIMS := ["idle", "walk", "crouch", "prejump", "jump", "land", "lunge", "handspring", "airflip", "roll"]
 # Which library (folder) each animation goes in.
@@ -172,33 +180,25 @@ func _make_anim(anim_name: String) -> Animation:
 func _anim_data(anim_name: String) -> Dictionary:
 	match anim_name:
 		"idle":
-			# Lowered combat stance (deep, wide, bladed; lead arm up in a guard)
-			# with a very small, slow, natural breath. Feet are kept level and
-			# the ground clamp plants them.
-			var low := {
-				"torso": 15.0,
-				"upper_arm_front": -78.0, "lower_arm_front": -62.0,
-				"upper_arm_back": -42.0, "lower_arm_back": -70.0,
-				"upper_leg_front": -58.0, "lower_leg_front": 76.0,
-				"upper_leg_back": 58.0, "lower_leg_back": -76.0,
-			}
-			var high := {
-				"torso": 16.0,
-				"upper_arm_front": -80.0, "lower_arm_front": -63.0,
-				"upper_arm_back": -44.0, "lower_arm_back": -71.0,
-				"upper_leg_front": -58.0, "lower_leg_front": 77.0,
-				"upper_leg_back": 58.0, "lower_leg_back": -77.0,
-			}
+			# The combat stance with a very small, slow, natural breath.
+			var high := _m([COMBAT, {
+				"torso": 8.0, "upper_arm_front": -80.0, "lower_arm_front": -63.0,
+				"upper_arm_back": -27.0, "lower_arm_back": -91.0,
+				"lower_leg_front": 78.0, "lower_leg_back": 78.0,
+			}])
 			return {"length": 3.0, "loop": true, "keys": [
-				{"t": 0.0, "pelvis": -42.0, "off": low},
-				{"t": 1.5, "pelvis": -43.5, "off": high},
-				{"t": 3.0, "pelvis": -42.0, "off": low},
+				{"t": 0.0, "pelvis": -44.0, "off": COMBAT},
+				{"t": 1.5, "pelvis": -45.5, "off": high},
+				{"t": 3.0, "pelvis": -44.0, "off": COMBAT},
 			]}
 		"walk":
+			# Same combat stance; only the legs shuffle to move.
+			var a := _m([COMBAT, {"upper_leg_front": -48.0, "upper_leg_back": -36.0}])
+			var b := _m([COMBAT, {"upper_leg_front": -60.0, "upper_leg_back": -24.0}])
 			return {"length": 0.6, "loop": true, "keys": [
-				{"t": 0.0, "pelvis": -56.0, "off": _m([GUARD, {"upper_leg_front": -14.0, "upper_leg_back": 14.0, "lower_leg_front": 8.0, "lower_leg_back": 8.0, "torso": 4.0}])},
-				{"t": 0.3, "pelvis": -56.0, "off": _m([GUARD, {"upper_leg_front": 8.0, "upper_leg_back": -8.0, "lower_leg_front": 8.0, "lower_leg_back": 8.0, "torso": 4.0}])},
-				{"t": 0.6, "pelvis": -56.0, "off": _m([GUARD, {"upper_leg_front": -14.0, "upper_leg_back": 14.0, "lower_leg_front": 8.0, "lower_leg_back": 8.0, "torso": 4.0}])},
+				{"t": 0.0, "pelvis": -44.0, "off": a},
+				{"t": 0.3, "pelvis": -44.0, "off": b},
+				{"t": 0.6, "pelvis": -44.0, "off": a},
 			]}
 		"crouch":
 			return {"length": 0.15, "loop": false, "keys": [

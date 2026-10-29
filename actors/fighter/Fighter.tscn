@@ -471,7 +471,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(0, -42), Vector2(0, -43.5), Vector2(0, -42)]
+"values": [Vector2(0, -44), Vector2(0, -45.5), Vector2(0, -44)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -507,7 +507,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.3089969389957472, -1.2915436464758039, -1.3089969389957472]
+"values": [-1.4486232791552935, -1.4311699866353502, -1.4486232791552935]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -543,7 +543,7 @@ tracks/6/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [2.4958208303518914, 2.4609142453120048, 2.4958208303518914]
+"values": [2.792526803190927, 2.7576202181510405, 2.792526803190927]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
@@ -555,7 +555,7 @@ tracks/7/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.0821041362364843, -1.0995574287564276, -1.0821041362364843]
+"values": [-1.4311699866353502, -1.4486232791552935, -1.4311699866353502]
 }
 tracks/8/type = "value"
 tracks/8/imported = false
@@ -567,7 +567,7 @@ tracks/8/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.47123889803846897, 0.47123889803846897, 0.47123889803846897]
+"values": [0.5410520681182421, 0.5410520681182421, 0.5410520681182421]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
@@ -579,7 +579,7 @@ tracks/9/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [1.3264502315156905, 1.3439035240356338, 1.3264502315156905]
+"values": [1.3439035240356338, 1.361356816555577, 1.3439035240356338]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
@@ -591,7 +591,7 @@ tracks/10/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [2.670353755551324, 2.670353755551324, 2.670353755551324]
+"values": [1.1344640137963142, 1.1344640137963142, 1.1344640137963142]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
@@ -603,7 +603,7 @@ tracks/11/keys = {
 "times": PackedFloat32Array(0, 1.5, 3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.3264502315156905, -1.3439035240356338, -1.3264502315156905]
+"values": [1.3439035240356338, 1.361356816555577, 1.3439035240356338]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lyinm"]
@@ -1292,7 +1292,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(0, -56), Vector2(0, -56), Vector2(0, -56)]
+"values": [Vector2(0, -44), Vector2(0, -44), Vector2(0, -44)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1321,74 +1321,74 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Rig/Root/pelvis/torso/upper_arm_back:rotation")
+tracks/3/path = NodePath("Rig/Root/pelvis/torso:rotation")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [2.321287905152458, 2.321287905152458, 2.321287905152458]
+"values": [-1.4486232791552935, -1.4486232791552935, -1.4486232791552935]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back:rotation")
+tracks/4/path = NodePath("Rig/Root/pelvis/torso/upper_arm_front:rotation")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.2915436464758039, -1.2915436464758039, -1.2915436464758039]
+"values": [1.6929693744344996, 1.6929693744344996, 1.6929693744344996]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Rig/Root/pelvis/torso/upper_arm_front:rotation")
+tracks/5/path = NodePath("Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front:rotation")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [2.0420352248333655, 2.0420352248333655, 2.0420352248333655]
+"values": [-0.9424777960769379, -0.9424777960769379, -0.9424777960769379]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front:rotation")
+tracks/6/path = NodePath("Rig/Root/pelvis/torso/upper_arm_back:rotation")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.1519173063162575, -1.1519173063162575, -1.1519173063162575]
+"values": [2.792526803190927, 2.792526803190927, 2.792526803190927]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Rig/Root/pelvis/upper_leg_front:rotation")
+tracks/7/path = NodePath("Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back:rotation")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [1.239183768915974, 1.6231562043547265, 1.239183768915974]
+"values": [-1.4311699866353502, -1.4311699866353502, -1.4311699866353502]
 }
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("Rig/Root/pelvis/upper_leg_back:rotation")
+tracks/8/path = NodePath("Rig/Root/pelvis/upper_leg_front:rotation")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [1.9024088846738192, 1.5184364492350666, 1.9024088846738192]
+"values": [0.6457718232379019, 0.4363323129985824, 0.6457718232379019]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
@@ -1400,31 +1400,31 @@ tracks/9/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.13962634015954636, 0.13962634015954636, 0.13962634015954636]
+"values": [1.3439035240356338, 1.3439035240356338, 1.3439035240356338]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("Rig/Root/pelvis/upper_leg_back/lower_leg_back:rotation")
+tracks/10/path = NodePath("Rig/Root/pelvis/upper_leg_back:rotation")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.13962634015954636, 0.13962634015954636, 0.13962634015954636]
+"values": [1.0297442586766545, 1.239183768915974, 1.0297442586766545]
 }
 tracks/11/type = "value"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("Rig/Root/pelvis/torso:rotation")
+tracks/11/path = NodePath("Rig/Root/pelvis/upper_leg_back/lower_leg_back:rotation")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [-1.5009831567151235, -1.5009831567151235, -1.5009831567151235]
+"values": [1.3439035240356338, 1.3439035240356338, 1.3439035240356338]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_0s53d"]
@@ -1436,129 +1436,129 @@ _data = {
 &"walk": SubResource("Animation_1r1yd")
 }
 
-[node name="Fighter" type="CharacterBody2D" unique_id=223629867]
+[node name="Fighter" type="CharacterBody2D" unique_id=753500106]
 script = ExtResource("1_72gs3")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=798054798]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1759749372]
 position = Vector2(0, -50)
 shape = SubResource("CapsuleShape2D_q78e4")
 
-[node name="Rig" type="Node2D" parent="." unique_id=1339589617]
+[node name="Rig" type="Node2D" parent="." unique_id=108849537]
 
-[node name="Root" type="Node2D" parent="Rig" unique_id=1523943478]
+[node name="Root" type="Node2D" parent="Rig" unique_id=1685645061]
 
-[node name="pelvis" type="Node2D" parent="Rig/Root" unique_id=447475659]
+[node name="pelvis" type="Node2D" parent="Rig/Root" unique_id=546044600]
 position = Vector2(0, -58)
 
-[node name="torso" type="Node2D" parent="Rig/Root/pelvis" unique_id=1662460955]
+[node name="torso" type="Node2D" parent="Rig/Root/pelvis" unique_id=677290959]
 rotation = -1.5707964
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=1172936320]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=1371643337]
 z_index = 5
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(6.123032e-16, 10, -5, 8.660254, -8.660254, 5, -10, 1.2246064e-15, -8.660254, -5, -5, -8.660254, -1.8369095e-15, -10, 44, -10, 49, -8.660254, 52.660255, -5, 54, 0, 52.660255, 5, 49, 8.660254, 44, 10)
 
-[node name="upper_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1365236760]
+[node name="upper_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=637729311]
 position = Vector2(38, 0)
 rotation = 3.2288592
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=585138615]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=140333715]
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.1430611e-16, 3.5, -1.75, 3.0310888, -3.0310888, 1.75, -3.5, 4.2861222e-16, -3.0310888, -1.75, -1.75, -3.0310888, -6.4291834e-16, -3.5, 22, -3.5, 23.75, -3.0310888, 25.03109, -1.75, 25.5, 0, 25.03109, 1.75, 23.75, 3.0310888, 22, 3.5)
 
-[node name="lower_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=739876433]
+[node name="lower_arm_back" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_back" unique_id=427226736]
 position = Vector2(22, 0)
 rotation = 0.13962634
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back" unique_id=241024466]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_back/lower_arm_back" unique_id=1808787068]
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(1.8369095e-16, 3, -1.5, 2.598076, -2.598076, 1.5, -3, 3.673819e-16, -2.598076, -1.5, -1.5, -2.598076, -5.5107286e-16, -3, 20, -3, 21.5, -2.598076, 22.598076, -1.5, 23, 0, 22.598076, 1.5, 21.5, 2.598076, 20, 3)
 
-[node name="upper_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=754017630]
+[node name="upper_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1811075539]
 position = Vector2(38, 0)
 rotation = 3.0543263
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=714350147]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=1322705299]
 z_index = 10
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.1430611e-16, 3.5, -1.75, 3.0310888, -3.0310888, 1.75, -3.5, 4.2861222e-16, -3.0310888, -1.75, -1.75, -3.0310888, -6.4291834e-16, -3.5, 22, -3.5, 23.75, -3.0310888, 25.03109, -1.75, 25.5, 0, 25.03109, 1.75, 23.75, 3.0310888, 22, 3.5)
 
-[node name="lower_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=1567690945]
+[node name="lower_arm_front" type="Node2D" parent="Rig/Root/pelvis/torso/upper_arm_front" unique_id=104221901]
 position = Vector2(22, 0)
 rotation = 0.13962634
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front" unique_id=1992959381]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/upper_arm_front/lower_arm_front" unique_id=2092169908]
 z_index = 10
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(1.8369095e-16, 3, -1.5, 2.598076, -2.598076, 1.5, -3, 3.673819e-16, -2.598076, -1.5, -1.5, -2.598076, -5.5107286e-16, -3, 20, -3, 21.5, -2.598076, 22.598076, -1.5, 23, 0, 22.598076, 1.5, 21.5, 2.598076, 20, 3)
 
-[node name="head" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1666736173]
+[node name="head" type="Node2D" parent="Rig/Root/pelvis/torso" unique_id=1977797963]
 position = Vector2(44, 0)
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=829102092]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=1778815084]
 z_index = 13
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(23, 0, 22.162674, 4.2095175, 19.778175, 7.7781744, 16.209518, 10.162675, 12, 11, 7.7904825, 10.162675, 4.2218256, 7.7781744, 1.8373251, 4.2095175, 1, 1.347067e-15, 1.8373251, -4.2095175, 4.2218256, -7.7781744, 7.7904825, -10.162675, 12, -11, 16.209518, -10.162675, 19.778175, -7.7781744, 22.162674, -4.2095175)
 
-[node name="eye" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=960115798]
+[node name="eye" type="Polygon2D" parent="Rig/Root/pelvis/torso/head" unique_id=992917604]
 z_index = 22
 z_as_relative = false
 color = Color(0.28627452, 0.7607843, 1, 1)
 polygon = PackedVector2Array(18.6, -3, 18.402086, -2.005023, 17.838478, -1.1615225, 16.994976, -0.59791327, 16, -0.4000001, 15.005023, -0.59791327, 14.161523, -1.1615225, 13.597914, -2.005023, 13.4, -3, 13.597914, -3.994977, 14.161523, -4.8384776, 15.005023, -5.4020867, 16, -5.6, 16.994976, -5.4020867, 17.838478, -4.8384776, 18.402086, -3.994977)
 
-[node name="gem" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=1369608413]
+[node name="gem" type="Polygon2D" parent="Rig/Root/pelvis/torso" unique_id=784660847]
 z_index = 23
 z_as_relative = false
 color = Color(0.28627452, 0.7607843, 1, 1)
 polygon = PackedVector2Array(22, -4, 28, 0, 22, 4, 16, 0)
 
-[node name="upper_leg_back" type="Node2D" parent="Rig/Root/pelvis" unique_id=855324814]
+[node name="upper_leg_back" type="Node2D" parent="Rig/Root/pelvis" unique_id=60231585]
 rotation = 1.6580628
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=848343452]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=1402109311]
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.7553643e-16, 4.5, -2.25, 3.8971143, -3.8971143, 2.25, -4.5, 5.5107286e-16, -3.8971143, -2.25, -2.25, -3.8971143, -8.266093e-16, -4.5, 30, -4.5, 32.25, -3.8971143, 33.897114, -2.25, 34.5, 0, 33.897114, 2.25, 32.25, 3.8971143, 30, 4.5)
 
-[node name="lower_leg_back" type="Node2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=1153461569]
+[node name="lower_leg_back" type="Node2D" parent="Rig/Root/pelvis/upper_leg_back" unique_id=1572200341]
 position = Vector2(30, 0)
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back/lower_leg_back" unique_id=1476989327]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_back/lower_leg_back" unique_id=384518857]
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.4492127e-16, 4, -2, 3.4641016, -3.4641016, 2, -4, 4.8984254e-16, -3.4641016, -2, -2, -3.4641016, -7.347638e-16, -4, 30, -4, 32, -3.4641016, 33.4641, -2, 34, 0, 33.4641, 2, 32, 3.4641016, 30, 4)
 
-[node name="upper_leg_front" type="Node2D" parent="Rig/Root/pelvis" unique_id=497126160]
+[node name="upper_leg_front" type="Node2D" parent="Rig/Root/pelvis" unique_id=940924491]
 rotation = 1.4835298
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=1025225940]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=1454049401]
 z_index = 10
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.7553643e-16, 4.5, -2.25, 3.8971143, -3.8971143, 2.25, -4.5, 5.5107286e-16, -3.8971143, -2.25, -2.25, -3.8971143, -8.266093e-16, -4.5, 30, -4.5, 32.25, -3.8971143, 33.897114, -2.25, 34.5, 0, 33.897114, 2.25, 32.25, 3.8971143, 30, 4.5)
 
-[node name="lower_leg_front" type="Node2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=557817470]
+[node name="lower_leg_front" type="Node2D" parent="Rig/Root/pelvis/upper_leg_front" unique_id=931711047]
 position = Vector2(30, 0)
 
-[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front/lower_leg_front" unique_id=875378682]
+[node name="vis" type="Polygon2D" parent="Rig/Root/pelvis/upper_leg_front/lower_leg_front" unique_id=1843579211]
 z_index = 10
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(2.4492127e-16, 4, -2, 3.4641016, -3.4641016, 2, -4, 4.8984254e-16, -3.4641016, -2, -2, -3.4641016, -7.347638e-16, -4, 30, -4, 32, -3.4641016, 33.4641, -2, 34, 0, 33.4641, 2, 32, 3.4641016, 30, 4)
 
-[node name="hip" type="Polygon2D" parent="Rig/Root/pelvis" unique_id=1437402604]
+[node name="hip" type="Polygon2D" parent="Rig/Root/pelvis" unique_id=1104632990]
 z_index = 4
 z_as_relative = false
 color = Color(0.08235294, 0.09019608, 0.12156863, 1)
 polygon = PackedVector2Array(11, 0, 10.162675, 4.2095175, 7.7781744, 7.7781744, 4.2095175, 10.162675, 6.735335e-16, 11, -4.2095175, 10.162675, -7.7781744, 7.7781744, -10.162675, 4.2095175, -11, 1.347067e-15, -10.162675, -4.2095175, -7.7781744, -7.7781744, -4.2095175, -10.162675, -2.0206005e-15, -11, 4.2095175, -10.162675, 7.7781744, -7.7781744, 10.162675, -4.2095175)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1447905106]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=240837378]
 libraries/crouchmove = SubResource("AnimationLibrary_82kcb")
 libraries/dash = SubResource("AnimationLibrary_yk367")
 libraries/idle = SubResource("AnimationLibrary_lyinm")

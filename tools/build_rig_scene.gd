@@ -172,18 +172,27 @@ func _make_anim(anim_name: String) -> Animation:
 func _anim_data(anim_name: String) -> Dictionary:
 	match anim_name:
 		"idle":
-			# Breathing: hips rise, torso sways, arms lift and legs flex a touch
-			# on the inhale (mid), settling on the exhale (ends).
-			var low := _m([GUARD, STANCE, {"torso": 6.0}])
-			var high := _m([
-				{"upper_arm_back": -55.0, "lower_arm_back": -84.0, "upper_arm_front": -61.0, "lower_arm_front": -76.0},
-				{"upper_leg_back": 9.0, "lower_leg_back": -10.0, "upper_leg_front": -9.0, "lower_leg_front": 10.0},
-				{"torso": 9.0},
-			])
-			return {"length": 1.4, "loop": true, "keys": [
-				{"t": 0.0, "pelvis": -56.0, "off": low},
-				{"t": 0.7, "pelvis": -58.0, "off": high},
-				{"t": 1.4, "pelvis": -56.0, "off": low},
+			# Lowered combat stance (deep, wide, bladed; lead arm up in a guard)
+			# with a very small, slow, natural breath. Feet are kept level and
+			# the ground clamp plants them.
+			var low := {
+				"torso": 15.0,
+				"upper_arm_front": -78.0, "lower_arm_front": -62.0,
+				"upper_arm_back": -42.0, "lower_arm_back": -70.0,
+				"upper_leg_front": -58.0, "lower_leg_front": 76.0,
+				"upper_leg_back": 58.0, "lower_leg_back": -76.0,
+			}
+			var high := {
+				"torso": 16.0,
+				"upper_arm_front": -80.0, "lower_arm_front": -63.0,
+				"upper_arm_back": -44.0, "lower_arm_back": -71.0,
+				"upper_leg_front": -58.0, "lower_leg_front": 77.0,
+				"upper_leg_back": 58.0, "lower_leg_back": -77.0,
+			}
+			return {"length": 3.0, "loop": true, "keys": [
+				{"t": 0.0, "pelvis": -42.0, "off": low},
+				{"t": 1.5, "pelvis": -43.5, "off": high},
+				{"t": 3.0, "pelvis": -42.0, "off": low},
 			]}
 		"walk":
 			return {"length": 0.6, "loop": true, "keys": [

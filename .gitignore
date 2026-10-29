@@ -20,3 +20,5 @@ builds/
 
 # Local reference material (not part of the game)
 _refs/
+
+# Mixamo FBX source files (keep .import, ignore if you want to exclude the raw fbx)

@@ -17,6 +17,13 @@ var _opponent: Node3D
 func _ready() -> void:
 	if opponent_path != NodePath(""):
 		_opponent = get_node_or_null(opponent_path)
+	# Play the imported Mixamo idle (looped).
+	var ap := $Model/Character.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap:
+		var a := ap.get_animation("mixamo_com")
+		if a:
+			a.loop_mode = Animation.LOOP_LINEAR
+		ap.play("mixamo_com")
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():

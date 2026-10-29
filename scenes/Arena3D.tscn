@@ -15,7 +15,8 @@ size = Vector3(40, 0.2, 10)
 size = Vector2(40, 10)
 
 [sub_resource type="StandardMaterial3D" id="GMat"]
-albedo_color = Color(0.553, 0.576, 0.627, 1)
+shading_mode = 2
+albedo_color = Color(0.5, 0.5, 0.52, 1)
 
 [sub_resource type="CapsuleMesh" id="OppMesh"]
 radius = 0.3
@@ -27,7 +28,7 @@ albedo_color = Color(0.4, 0.42, 0.5, 1)
 [node name="Arena3D" type="Node3D"]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, 2.4, 9)
+transform = Transform3D(1, 0, 0, 0, 0.985, 0.174, 0, -0.174, 0.985, 0, 2.0, 9)
 projection = 1
 size = 4.2
 
